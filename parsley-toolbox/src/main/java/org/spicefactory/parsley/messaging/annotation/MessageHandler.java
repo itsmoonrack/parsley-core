@@ -4,7 +4,6 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -32,7 +31,6 @@ import org.spicefactory.parsley.core.scope.Scope;
 @Documented
 @Target(METHOD)
 @Retention(RUNTIME)
-@Repeatable(value = MessageHandlers.class)
 public @interface MessageHandler {
 
 	/**

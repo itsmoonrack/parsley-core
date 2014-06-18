@@ -1,4 +1,4 @@
-package org.spicefactory.parsley.core.messaging.impl;
+package org.spicefactory.parsley.messaging;
 
 import javax.annotation.Nullable;
 
@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.spicefactory.parsley.core.scope.Scope;
 import org.spicefactory.parsley.core.scope.ScopeManager;
 
-public final class MessageDispatcher {
+public final class MessageDispatcher extends FunctionDispatcher {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -21,6 +21,7 @@ public final class MessageDispatcher {
 		this.scopeManager = scopeManager;
 	}
 
+	@Override
 	public void dispatchMessage(Object message, @Nullable Object selector) {
 		if (!enabled) {
 			logger.warn("Attempt to use message dispatched after it has been disabled.");

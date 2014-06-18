@@ -18,7 +18,7 @@ import org.spicefactory.parsley.core.messaging.MessageState;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
 import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
 
-//Package-protected.
+//Package-private.
 final class DefaultMessageProcessor implements MessageProcessor {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -31,12 +31,12 @@ final class DefaultMessageProcessor implements MessageProcessor {
 	private final MessageReceiverCache cache;
 	private final Method receiverHandler;
 
-	// Package-protected.
+	// Package-private.
 	DefaultMessageProcessor(Message message, MessageReceiverCache cache) {
 		this(message, cache, null);
 	}
 
-	// Package-protected.
+	// Package-private.
 	DefaultMessageProcessor(Message message, MessageReceiverCache cache, @Nullable Method receiverHandler) {
 		this.cache = cache;
 		this.message = message;
@@ -94,7 +94,7 @@ final class DefaultMessageProcessor implements MessageProcessor {
 		if (state == MessageState.CANCELLED) {
 			throw new IllegalStateException("Cannot rewind. Message state is cancelled.");
 		}
-		logger.trace("Rewind message '{}' with {} receiver(s).", message.getType(), remainingProcessors.get(0).receiverCount());
+		logger.trace("Rewind message '{}' with {} receiver(s).", message.type(), remainingProcessors.get(0).receiverCount());
 		createProcessors();
 	}
 
@@ -108,7 +108,7 @@ final class DefaultMessageProcessor implements MessageProcessor {
 	 * @return the receivers for the message type and receiver kind this processor handles
 	 */
 	protected List<MessageReceiver> fetchReceivers() {
-		return new ArrayList<MessageReceiver>(cache.getReceivers(MessageReceiverKind.TARGET, message.getSelector()));
+		return new ArrayList<MessageReceiver>(cache.getReceivers(MessageReceiverKind.TARGET, message.selector()));
 	}
 
 	@Override
