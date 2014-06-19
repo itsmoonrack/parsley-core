@@ -9,7 +9,9 @@ public class Test {
 	public Test() {
 
 		// Framework bindings.
-		dispatcher = new org.spicefactory.parsley.messaging.MessageDispatcher(null, null);
+		org.spicefactory.parsley.core.messaging.impl.MessageDispatcher instance =
+				new org.spicefactory.parsley.core.messaging.impl.MessageDispatcher(null, null);
+		dispatcher = instance::dispatchMessage;
 
 		// Client API.
 		dispatcher.dispatchMessage("");
