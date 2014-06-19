@@ -25,17 +25,31 @@ public class ViewConfiguration {
 	public final Component view;
 
 	/**
+	 * The processor to use for the target instance.
+	 * <p>
+	 * This property may be null, in this case the default processor installed in the Context will be used.
+	 */
+	public @Nullable ViewProcessor processor;
+
+	/**
+	 * Indicates whether the target should be removed when the view is removed from the stage. Only has an effect when no custom
+	 * <code>ViewLifecycle</code> has been set. The exact action to be performed when the view gets removed from the stage is determined by the
+	 * <code>destroy</code> method of the <code>ViewProcessor</code>.
+	 */
+	public boolean autoremove;
+
+	/**
 	 * The configuration id to use to look up an object definition matching this target instance. If a definition has already been set for this
 	 * configuration instance, this value will be ignored.
 	 */
 	public final String configId;
 
 	/**
-	 * The processor to use for the target instance.
-	 * <p>
-	 * This property may be null, in this case the default processor installed in the Context will be used.
+	 * Indicates whether the target instance will be reused in subsequent life-cycles of the view. When set to false the configuration will only
+	 * be processed once. This value should be true if the application keeps instances of the view in memory and adds them back to the stage
+	 * later. It should be false if the view will get garbage collected once it has been removed from the stage.
 	 */
-	public @Nullable ViewProcessor processor;
+	public boolean reuse;
 
 	/**
 	 * Creates a new instance.
@@ -68,6 +82,11 @@ public class ViewConfiguration {
 	 */
 	public ViewConfiguration(Component view) {
 		this(view, null, null);
+	}
+
+	@FunctionalInterface
+	public interface CompleteHandler {
+		void configurationComplete();
 	}
 
 }

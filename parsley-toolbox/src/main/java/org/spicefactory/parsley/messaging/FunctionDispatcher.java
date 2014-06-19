@@ -11,7 +11,7 @@ package org.spicefactory.parsley.messaging;
  * class LoginMessage {
  *     public User user;
  *     public String role;
- * 
+ *
  *     public LoginMessage(User user, String role) {
  *         this.user = user;
  *         this.role = role;
@@ -41,12 +41,13 @@ package org.spicefactory.parsley.messaging;
  * pass any kind of object to this dispatcher function.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public abstract class FunctionDispatcher {
+@FunctionalInterface
+public interface FunctionDispatcher {
 
 	// Delegated to dispatchMessage method on concrete MessageDispatcher instance.
-	abstract void dispatchMessage(Object message, Object selector);
+	void dispatchMessage(Object message, Object selector);
 
-	public void dispatchMessage(Object message) {
+	default void dispatchMessage(Object message) {
 		dispatchMessage(message, null);
 	}
 
