@@ -70,4 +70,8 @@ public class ViewConfiguration {
 		this(view, null, null);
 	}
 
+	public interface CompleteHandler {
+		void configurationComplete();
+	}
+
 }
