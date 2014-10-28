@@ -3,17 +3,18 @@ package org.spicefactory.parsley.core.scope.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spicefactory.parsley.core.bootstrap.BootstrapInfo;
+import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.ObservableCommand;
+import org.spicefactory.parsley.core.command.ObservableCommand.CommandObserver;
 import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
@@ -31,19 +32,24 @@ import org.spicefactory.parsley.core.scope.ScopeManager;
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
 @Singleton
-public class DefaultScopeManager implements ScopeManager {
+class GuiceScopeManager implements ScopeManager {
 
-	@Inject
-	private Logger logger;
+	private final Logger logger = LoggerFactory.getLogger(GuiceScopeManager.class);
 
 	private final Map<String, Scope> scopes;
 	private final MessageRouter messageRouter;
+	private final CommandManager commandManager;
 	private final ScopeInfoRegistry scopeInfoRegistry;
 
+	/////////////////////////////////////////////////////////////////////////////
+	// Package-private.
+	/////////////////////////////////////////////////////////////////////////////
+
 	@Inject
-	DefaultScopeManager(ScopeInfoRegistry scopeInfoRegistry, MessageRouter messageRouter) {
+	GuiceScopeManager(ScopeInfoRegistry scopeInfoRegistry, MessageRouter messageRouter, CommandManager commandManager) {
 		this.scopes = new HashMap<String, Scope>();
 		this.messageRouter = messageRouter;
+		this.commandManager = commandManager;
 		this.scopeInfoRegistry = scopeInfoRegistry;
 
 		initScopes(null);
@@ -67,7 +73,7 @@ public class DefaultScopeManager implements ScopeManager {
 			addScope(scopeInfo, info);
 		}
 		for (ScopeDefinition scopeDef : scopeInfoRegistry.getNewScopes()) {
-			ScopeInfo newScope = new DefaultScopeInfo(scopeDef);
+			ScopeInfo newScope = new GuiceScopeInfo(scopeDef, commandManager);
 			addScope(newScope, info);
 		}
 	}
@@ -85,6 +91,10 @@ public class DefaultScopeManager implements ScopeManager {
 		Scope scope = new DefaultScope(scopeInfo, messageRouter);
 		scopes.put(scope.name(), scope);
 	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public boolean hasScope(String name) {
@@ -127,7 +137,53 @@ public class DefaultScopeManager implements ScopeManager {
 
 	@Override
 	public void observeCommand(ObservableCommand command) {
-		// TODO Auto-generated method stub
+		List<MessageReceiverCache> typeCaches = new ArrayList<MessageReceiverCache>();
+		List<MessageReceiverCache> triggerCaches = new ArrayList<MessageReceiverCache>();
+		for (ScopeInfo scope : scopeInfoRegistry.getActiveScopes()) {
+			if (command.trigger() != null) {
+				triggerCaches.add(scope.getMessageReceiverCache(command.trigger().type()));
+			}
+			typeCaches.add(scope.getMessageReceiverCache(command.type()));
+		}
+		CommandHandler commandHandler = new CommandHandler(typeCaches, triggerCaches);
+		command.observe(commandHandler);
+		commandHandler.update(command);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Internal implementation.
+	/////////////////////////////////////////////////////////////////////////////
+
+	private class CommandHandler implements CommandObserver {
+
+		private final MessageReceiverCache typeCache;
+		private final MessageReceiverCache triggerCache;
+
+		public CommandHandler(List<MessageReceiverCache> typeCaches, List<MessageReceiverCache> triggerCaches) {
+			typeCache = new MergedMessageReceiverCache(typeCaches);
+			triggerCache = new MergedMessageReceiverCache(triggerCaches);
+		}
+
+		@Override
+		public void update(ObservableCommand command) {
+			if (!hasReceivers(command)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Discarding command status {} for message '{}': no matching observer.", command.status(),
+							(command.trigger() == null ? "no trigger" : command.trigger().instance()));
+				}
+				return;
+			}
+			messageRouter.observeCommand(command, typeCache, triggerCache);
+		}
+
+		private boolean hasReceivers(ObservableCommand command) {
+			if (command.trigger() != null
+					&& triggerCache.getReceivers(MessageReceiverKind.forCommandStatus(command.status(), true), command.trigger().selector())
+							.size() > 0) {
+				return true;
+			}
+			return typeCache.getReceivers(MessageReceiverKind.forCommandStatus(command.status(), false), command.id()).size() > 0;
+		}
 
 	}
 
@@ -140,8 +196,8 @@ public class DefaultScopeManager implements ScopeManager {
 		}
 
 		@Override
-		public Set<MessageReceiver> getReceivers(MessageReceiverKind kind, String selector) {
-			Set<MessageReceiver> receivers = new HashSet<MessageReceiver>();
+		public List<MessageReceiver> getReceivers(MessageReceiverKind kind, String selector) {
+			List<MessageReceiver> receivers = new ArrayList<MessageReceiver>();
 			for (MessageReceiverCache cache : caches) {
 				receivers.addAll(cache.getReceivers(kind, selector));
 			}

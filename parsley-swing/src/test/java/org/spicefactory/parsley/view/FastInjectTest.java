@@ -13,7 +13,7 @@ public class FastInjectTest extends JFrame {
 	}
 
 	void test() {
-		SwingUtilities.getWindowAncestor(c)
+		//		SwingUtilities.getWindowAncestor(c)
 		Component c = getParent();
 		while (c != null) {
 			System.out.println(c);

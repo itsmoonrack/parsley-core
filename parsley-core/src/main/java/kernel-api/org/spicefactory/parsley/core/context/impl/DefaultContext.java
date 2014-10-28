@@ -3,11 +3,12 @@ package org.spicefactory.parsley.core.context.impl;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import org.spicefactory.lib.event.AbstractEventDispatcher;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.context.ContextListener;
-import org.spicefactory.parsley.core.events.AbstractEventDispatcher;
 import org.spicefactory.parsley.core.events.ContextEvent;
 import org.spicefactory.parsley.core.registry.Registry;
+import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.core.view.ViewManager;
 
 public final class DefaultContext extends AbstractEventDispatcher<ContextListener, ContextEvent> implements Context, ContextListener {
@@ -36,19 +37,6 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 	}
 
 	@Override
-	protected void processEvent(ContextListener l, ContextEvent e) {
-		switch (e.getId()) {
-			case ContextEvent.DESTROYED:
-				l.contextDestroyed(e);
-				break;
-
-			default:
-				break;
-		}
-
-	}
-
-	@Override
 	public <T> T getInstance(Class<T> type) {
 		// TODO Auto-generated method stub
 		return null;
@@ -67,7 +55,7 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 	}
 
 	@Override
-	public void contextDestroyed(ContextEvent e) {
+	public void process(ContextEvent e) {
 		// TODO Auto-generated method stub
 
 	}
@@ -75,7 +63,7 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 	private class ParentContextListener implements ContextListener {
 
 		@Override
-		public void contextDestroyed(ContextEvent e) {
+		public void process(ContextEvent event) {
 			// TODO Auto-generated method stub
 
 		}
@@ -84,12 +72,12 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 
 	@Override
 	public void addContextListener(ContextListener l) {
-		addEventListener(l);
+		addEventListener(ContextEvent.DESTROYED, l);
 	}
 
 	@Override
 	public void removeContextListener(ContextListener l) {
-		removeEventListener(l);
+		removeEventListener(ContextEvent.DESTROYED, l);
 	}
 
 	@Override
@@ -100,6 +88,12 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 	@Override
 	public ViewManager getViewManager() {
 		return viewManager;
+	}
+
+	@Override
+	public ScopeManager getScopeManager() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -3,6 +3,7 @@ package org.spicefactory.parsley.core.scope.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.spicefactory.parsley.core.scope.ScopeDefinition;
@@ -12,6 +13,7 @@ import org.spicefactory.parsley.core.scope.ScopeInfoRegistry;
 @Singleton
 class DefaultScopeInfoRegistry implements ScopeInfoRegistry {
 
+	@Inject
 	DefaultScopeInfoRegistry(List<ScopeDefinition> newScopes, List<ScopeInfo> parentScopes) {
 		this.newScopes = newScopes;
 		this.parentScopes = parentScopes;

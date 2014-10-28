@@ -2,6 +2,7 @@ package org.spicefactory.parsley.core.context;
 
 import javax.annotation.Nullable;
 
+import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.core.view.ViewManager;
 
 /**
@@ -45,6 +46,13 @@ public interface Context {
 	 */
 	@Nullable
 	Context[] getParents();
+
+	/**
+	 * Gets scope manager that handles all scopes that this Context belongs to.
+	 * <p>
+	 * This includes scopes inherited from parent Contexts as well as scopes created for this Context.
+	 */
+	ScopeManager getScopeManager();
 
 	/**
 	 * Gets view manager used to dynamically wire view instances to this Context.

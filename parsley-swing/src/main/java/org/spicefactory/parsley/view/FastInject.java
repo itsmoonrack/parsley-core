@@ -9,7 +9,7 @@ import org.spicefactory.parsley.core.view.ViewLifecycle;
  * Provides a fluent API for injecting a managed object from the nearest Context in the view hierarchy into a view without reflecting on the
  * view.
  * <p>
- * This API can be used in Java components (Swing) as an alternative to the <code>FastInject</code> FXML tag for FXML components.
+ * This API can be used in Java components (Swing) as an alternative to the <code>FastInject</code> FXML annotation for FXML components.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
 public class FastInject {

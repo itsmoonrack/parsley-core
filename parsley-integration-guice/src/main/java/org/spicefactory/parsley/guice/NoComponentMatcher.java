@@ -14,8 +14,7 @@ import com.google.inject.matcher.Matchers;
  * seldom if never used on these classes. Best practices are to use a Presentation Model for the state of the UI, and inject them in swing
  * component by Guice mechanism which does not reflect on parent classes.
  * <p>
- * Use this matcher when you want to reflect on parent classes such as base or abstract classes. For instance see <code>AbstractReader</code>
- * which inject both a <code>Logger</code> and a <code>MessageDispatcher</code>.
+ * Use this matcher when you want to reflect on parent classes such as base or abstract classes.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
 @SuppressWarnings("rawtypes")

@@ -1,11 +1,10 @@
 package org.spicefactory.parsley.core.messaging.impl;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -43,14 +42,10 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	 */
 	void checkNewCollection(MessageReceiverCollection collection) {
 		if (messageType.isAssignableFrom(collection.messageType())) { // TODO: Check order of isAssignableFrom.
-			collection.addEventListener(this);
+			collection.addEventListener(CollectionEvent.CHANGE, this);
 			selectorMaps.clear();
 			addListener(collection);
 		}
-	}
-
-	private void addListener(MessageReceiverCollection collection) {
-		collection.addEventListener(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -58,7 +53,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public Set<MessageReceiver> getReceivers(MessageReceiverKind kind, String selector) {
+	public List<MessageReceiver> getReceivers(MessageReceiverKind kind, String selector) {
 		return getSelectorMap(kind).getReceivers(selector, messageType.getClassLoader());
 	}
 
@@ -77,16 +72,6 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 		return null;
 	}
 
-	@Override
-	public void collectionChanged(CollectionEvent e) {
-		selectorMaps.clear();
-		MessageReceiverCollection collection = (MessageReceiverCollection) e.getSource();
-		if (collection.isEmpty()) {
-			collection.removeEventListener(this);
-			collections.remove(collection);
-		}
-	}
-
 	/**
 	 * Releases this selection cache in case it is no longer used.
 	 * <p>
@@ -95,7 +80,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	public void dispose() {
 		selectorMaps.clear();
 		for (MessageReceiverCollection collection : collections) {
-			collection.removeEventListener(this);
+			collection.removeEventListener(CollectionEvent.CHANGE, this);
 		}
 		collections.clear();
 	}
@@ -130,17 +115,31 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 		return null;
 	}
 
+	private void addListener(MessageReceiverCollection collection) {
+		collection.addEventListener(CollectionEvent.CHANGE, this);
+	}
+
+	@Override
+	public void process(CollectionEvent e) {
+		selectorMaps.clear();
+		MessageReceiverCollection collection = (MessageReceiverCollection) e.getSource();
+		if (collection.isEmpty()) {
+			collection.removeEventListener(CollectionEvent.CHANGE, this);
+			collections.remove(collection);
+		}
+	}
+
 	private class SelectorMap {
 
 		private final MessageReceiverKind kind;
-		private final Map<Object, Set<MessageReceiver>> cache;
+		private final Map<Object, List<MessageReceiver>> cache;
 
 		public SelectorMap(MessageReceiverKind kind) {
 			this.kind = kind;
-			this.cache = new HashMap<Object, Set<MessageReceiver>>();
+			this.cache = new HashMap<Object, List<MessageReceiver>>();
 		}
 
-		public Set<MessageReceiver> getReceivers(@Nullable String selector, ClassLoader loader) {
+		public List<MessageReceiver> getReceivers(@Nullable String selector, ClassLoader loader) {
 			if (selector == null || selector.getClass().isPrimitive()) {
 				return getReceiversBySelectorValue(selector);
 			} else {
@@ -148,13 +147,13 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 			}
 		}
 
-		private Set<MessageReceiver> getReceiversBySelectorValue(String selector) {
-			Set<MessageReceiver> receivers = cache.get(selector);
+		private List<MessageReceiver> getReceiversBySelectorValue(String selector) {
+			List<MessageReceiver> receivers = cache.get(selector);
 
 			if (receivers == null) {
-				receivers = new HashSet<MessageReceiver>();
+				receivers = new ArrayList<MessageReceiver>();
 				for (MessageReceiverCollection collection : collections) {
-					Set<MessageReceiver> subset = collection.getReceiversBySelectorValue(kind, selector);
+					List<MessageReceiver> subset = collection.getReceiversBySelectorValue(kind, selector);
 					receivers.addAll(subset);
 				}
 				cache.put(selector, receivers);
@@ -163,7 +162,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 			return receivers;
 		}
 
-		private Set<MessageReceiver> getReceiversBySelectorType(String selector, ClassLoader loader) {
+		private List<MessageReceiver> getReceiversBySelectorType(String selector, ClassLoader loader) {
 			return null;
 		}
 	}

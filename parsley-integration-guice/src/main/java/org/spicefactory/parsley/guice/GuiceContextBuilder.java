@@ -26,7 +26,7 @@ public class GuiceContextBuilder {
 				.newSetup() //
 				.viewRoot(viewRoot) //
 				.newBuilder() //
-				.config(GuiceConfig.forModules(stage, modules)) //
+				.config(GuiceParsley.forModules(stage, modules)) //
 				.build();
 	}
 

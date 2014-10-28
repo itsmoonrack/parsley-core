@@ -9,9 +9,9 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.TypeElement;
 
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.model.MetaMessage;
+import org.spicefactory.parsley.messaging.modelgen.model.MetaMessage;
 
-@SupportedAnnotationTypes({"com.swissquote.eforex.fxbook.infrastructure.messaging.annotation.MessageHandler"})
+@SupportedAnnotationTypes({"org.spicefactory.parsley.messaging.annotation.MessageHandler"})
 public class MessageMetamodelProcessor extends AbstractProcessor {
 
 	public static final String ADD_GENERATION_DATE = "addGenerationDate";

@@ -39,6 +39,6 @@ public @interface MessageSettings {
 	 * In a modular application it is not uncommon that most message receivers are only interested in local messages. Switching the default
 	 * allows to avoid specifying the local scope explicitly on all meta-data tags.
 	 */
-	String defaultReceiverScope() default Scope.GLOBAL;
+	String defaultReceiverScope() default Scope.GLOBAL_;
 
 }

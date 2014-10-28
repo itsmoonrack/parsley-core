@@ -27,6 +27,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 	DefaultMessageHandler(MessageHandler info) {
 		super(info);
 		this.messageProperties = info.messagesProperties();
+
 	}
 
 	@Override
@@ -135,14 +136,14 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 					if (MessageProcessor.class.isAssignableFrom(targetMethod.getParameterTypes()[0])) {
 						args.add(processor);
 					} else {
-						args.add(processor.getMessage().instance());
+						args.add(processor.message().instance());
 					}
 				}
 				if (count >= 2) {
 					if (targetMethod.getParameterTypes()[1].equals(MessageProcessor.class)) {
 						args.add(processor);
 					} else {
-						args.add(processor.getMessage().selector());
+						args.add(processor.message().selector());
 						if (count == 3) {
 							args.add(processor);
 						}
@@ -151,7 +152,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 			} else {
 				for (Field field : messageFields) {
 					field.setAccessible(true);
-					args.add(field.get(processor.getMessage().instance()));
+					args.add(field.get(processor.message().instance()));
 				}
 				if (targetMethod.getParameterTypes().length > args.size()) {
 					args.add(processor);

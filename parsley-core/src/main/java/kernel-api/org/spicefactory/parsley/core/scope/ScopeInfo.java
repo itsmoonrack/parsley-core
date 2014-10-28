@@ -1,5 +1,7 @@
 package org.spicefactory.parsley.core.scope;
 
+import org.spicefactory.parsley.core.command.CommandManager;
+import org.spicefactory.parsley.core.command.ObservableCommand;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
@@ -44,5 +46,17 @@ public interface ScopeInfo {
 	 * @return the cache of message receivers for the specified message type
 	 */
 	MessageReceiverCache getMessageReceiverCache(Class<?> type);
+
+	/**
+	 * The manager for active commands in this scope.
+	 */
+	CommandManager commandManager();
+
+	/**
+	 * Adds an active command to the command manager of this scope.
+	 * <p>
+	 * As the CommandManager is a public API it does not contain a comparable method itself.
+	 */
+	void addActiveCommand(ObservableCommand command);
 
 }

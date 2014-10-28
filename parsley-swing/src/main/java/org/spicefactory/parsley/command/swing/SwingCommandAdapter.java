@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import javax.swing.SwingWorker;
 
-import org.spicefactory.parsley.core.command.adapter.CommandAdapter;
+import org.spicefactory.lib.command.adapter.CommandAdapter;
 
 class SwingCommandAdapter extends SwingWorker<Object, Void> implements CommandAdapter {
 

@@ -9,7 +9,7 @@ import com.google.inject.AbstractModule;
 
 @ViewSettings
 @MessageSettings
-@ScopeDefinition(name = Scope.GLOBAL)
+@ScopeDefinition(name = Scope.GLOBAL_)
 public class GuiceBootstrapConfig extends AbstractModule {
 
 	@Override

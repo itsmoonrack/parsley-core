@@ -1,6 +1,6 @@
 package org.spicefactory.parsley.core.command;
 
-import java.lang.reflect.Method;
+import javax.annotation.Nullable;
 
 import org.spicefactory.parsley.core.messaging.Message;
 
@@ -13,6 +13,7 @@ public interface ObservableCommand {
 	/**
 	 * The message that triggered the command. This property is null when the command was started programmatically.
 	 */
+	@Nullable
 	Message trigger();
 
 	/**
@@ -51,6 +52,18 @@ public interface ObservableCommand {
 	 * function must accept an argument of type ObservableCommand.
 	 * @param callback the callback to invoke when the command completes
 	 */
-	void observe(Method callback);
+	void observe(CommandObserver callback);
+
+	/**
+	 * Observes the completion of a command.
+	 */
+	public interface CommandObserver {
+
+		/**
+		 * This method is called whenever the observed command has changed.
+		 */
+		void update(ObservableCommand command);
+
+	}
 
 }

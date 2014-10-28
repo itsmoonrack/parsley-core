@@ -1,6 +1,6 @@
 package org.spicefactory.parsley.core.messaging;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -18,7 +18,7 @@ public interface MessageReceiverCache {
 	 * @param selector the selector to use for finding matching receivers
 	 * @return the receivers for the specified receiver kind and message
 	 */
-	Set<MessageReceiver> getReceivers(MessageReceiverKind kind, @Nullable String selector);
+	List<MessageReceiver> getReceivers(MessageReceiverKind kind, @Nullable String selector);
 
 	/**
 	 * Returns the value of the selector property of the specified message instance.

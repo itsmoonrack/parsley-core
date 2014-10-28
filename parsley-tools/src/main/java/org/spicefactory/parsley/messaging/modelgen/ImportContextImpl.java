@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.model.ImportContext;
+import org.spicefactory.parsley.messaging.modelgen.model.ImportContext;
 
 public class ImportContextImpl implements ImportContext {
 

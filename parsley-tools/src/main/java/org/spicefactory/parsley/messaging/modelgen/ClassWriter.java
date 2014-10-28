@@ -13,9 +13,8 @@ import javax.annotation.processing.FilerException;
 import javax.tools.FileObject;
 
 import org.spicefactory.parsley.messaging.metamodel.MessageMetamodel;
-
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.model.MetaAttribute;
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.model.MetaMessage;
+import org.spicefactory.parsley.messaging.modelgen.model.MetaAttribute;
+import org.spicefactory.parsley.messaging.modelgen.model.MetaMessage;
 
 /**
  * Helper class to write the actual meta model class using the {@link javax.annotation.processing.Filer} API.

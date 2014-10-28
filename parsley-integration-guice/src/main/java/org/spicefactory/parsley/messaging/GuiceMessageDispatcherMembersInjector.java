@@ -9,13 +9,13 @@ import org.spicefactory.parsley.messaging.annotation.MessageDispatcher;
 
 import com.google.inject.MembersInjector;
 
-class GuiceMessageDispatcherMembersInjector<T> implements MembersInjector<T> {
+public class GuiceMessageDispatcherMembersInjector<T> implements MembersInjector<T> {
 
 	private final Field field;
 	private final MessageDispatcher fieldInfo;
 	private final Provider<ScopeManager> scopeManager;
 
-	GuiceMessageDispatcherMembersInjector(Provider<ScopeManager> scopeManager, Field field) {
+	public GuiceMessageDispatcherMembersInjector(Provider<ScopeManager> scopeManager, Field field) {
 		this.field = field;
 		this.fieldInfo = field.getAnnotation(MessageDispatcher.class);
 		this.scopeManager = scopeManager;

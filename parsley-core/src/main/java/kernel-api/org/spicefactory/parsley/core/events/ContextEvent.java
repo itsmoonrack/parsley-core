@@ -1,30 +1,23 @@
 package org.spicefactory.parsley.core.events;
 
-import java.util.EventObject;
-
+import org.spicefactory.lib.event.Event;
 import org.spicefactory.parsley.core.context.Context;
 
 /**
  * Event that fires when a Context changes its internal state.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public class ContextEvent extends EventObject {
+public class ContextEvent extends Event {
+
+	private static final long serialVersionUID = -4487196234461520013L;
 
 	/**
 	 * Constant for the type of event fired when a Context instance was destroyed.
-	 * @param source
 	 */
-	public static final int DESTROYED = 8;
+	public static final int DESTROYED = 0x08;
 
-	private transient int id;
-
-	public ContextEvent(Context source, int id) {
-		super(source);
-		this.id = id;
-	}
-
-	public int getId() {
-		return id;
+	public ContextEvent(Context source, int type) {
+		super(source, type);
 	}
 
 	public Context getContext() {

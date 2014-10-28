@@ -6,8 +6,7 @@ import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.SimpleTypeVisitor6;
 
 import org.spicefactory.parsley.messaging.modelgen.Context;
-
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.util.TypeUtils;
+import org.spicefactory.parsley.messaging.modelgen.util.TypeUtils;
 
 public class MetaAttributeGenerationVisitor extends SimpleTypeVisitor6<AnnotationMetaAttribute, Element> {
 

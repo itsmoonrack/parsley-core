@@ -2,8 +2,8 @@ package org.spicefactory.parsley.core.view;
 
 import java.util.EventListener;
 
+import org.spicefactory.lib.event.EventDispatcher;
 import org.spicefactory.parsley.core.context.Context;
-import org.spicefactory.parsley.core.events.EventDispatcher;
 
 /**
  * Represents an object that controls the life-cycle of one particular view instance.

@@ -13,8 +13,7 @@ import org.spicefactory.parsley.messaging.modelgen.ImportContextImpl;
 import org.spicefactory.parsley.messaging.modelgen.model.ImportContext;
 import org.spicefactory.parsley.messaging.modelgen.model.MetaAttribute;
 import org.spicefactory.parsley.messaging.modelgen.model.MetaMessage;
-
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.util.AccessType;
+import org.spicefactory.parsley.messaging.modelgen.util.AccessType;
 
 public class AnnotationMetaMessage implements MetaMessage {
 

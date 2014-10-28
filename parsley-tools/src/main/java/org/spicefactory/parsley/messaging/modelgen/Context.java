@@ -6,8 +6,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.util.Elements;
 
 import org.slf4j.Logger;
-
-import com.swissquote.eforex.fxbook.infrastructure.core.messaging.modelgen.model.MetaMessage;
+import org.spicefactory.parsley.messaging.modelgen.model.MetaMessage;
 
 public final class Context {
 

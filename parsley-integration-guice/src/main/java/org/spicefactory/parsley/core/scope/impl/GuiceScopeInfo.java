@@ -1,5 +1,8 @@
 package org.spicefactory.parsley.core.scope.impl;
 
+import org.spicefactory.parsley.core.command.CommandManager;
+import org.spicefactory.parsley.core.command.ObservableCommand;
+import org.spicefactory.parsley.core.command.impl.GuiceCommandManager;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
@@ -11,9 +14,13 @@ import org.spicefactory.parsley.core.scope.ScopeInfo;
  * Default implementation of the ScopeInfo interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-class DefaultScopeInfo implements ScopeInfo {
+class GuiceScopeInfo implements ScopeInfo {
 
-	DefaultScopeInfo(ScopeDefinition definition /*, BootstrapInfo info*/) {
+	/////////////////////////////////////////////////////////////////////////////
+	// Package-private.
+	/////////////////////////////////////////////////////////////////////////////
+
+	GuiceScopeInfo(ScopeDefinition definition, CommandManager commandManager /*, BootstrapInfo info*/) {
 		this.name = definition.name();
 		this.uuid = definition.uuid();
 		this.inherited = definition.inherited();
@@ -26,7 +33,12 @@ class DefaultScopeInfo implements ScopeInfo {
 		//				e.printStackTrace();
 		//			}
 		//		}
+		this.commandManager = commandManager;
 	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public String name() {
@@ -59,9 +71,25 @@ class DefaultScopeInfo implements ScopeInfo {
 		return messageReceivers.getSelectionCache(type);
 	}
 
+	@Override
+	public CommandManager commandManager() {
+		return commandManager;
+	}
+
+	@Override
+	public void addActiveCommand(ObservableCommand command) {
+		((GuiceCommandManager) commandManager).addActiveCommand(command);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Internal implementation.
+	/////////////////////////////////////////////////////////////////////////////
+
 	private final String name;
 	private final String uuid;
 	private final boolean inherited;
 	private final DefaultMessageReceiverRegistry messageReceivers;
+
+	private final CommandManager commandManager;
 
 }

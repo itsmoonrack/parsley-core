@@ -6,7 +6,7 @@ import java.awt.event.HierarchyListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spicefactory.parsley.core.events.Event;
+import org.spicefactory.lib.event.Event;
 import org.spicefactory.parsley.core.events.ViewConfigurationEvent;
 import org.spicefactory.parsley.core.view.ViewConfiguration;
 import org.spicefactory.parsley.core.view.ViewConfiguration.CompleteHandler;

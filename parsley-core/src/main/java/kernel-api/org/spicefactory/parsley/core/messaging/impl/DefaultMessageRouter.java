@@ -19,8 +19,8 @@ class DefaultMessageRouter implements MessageRouter {
 
 	@Override
 	public void observeCommand(ObservableCommand command, MessageReceiverCache typeCache, MessageReceiverCache triggerCache) {
-		// TODO Auto-generated method stub
-
+		DefaultCommandObserverProcessor processor = new DefaultCommandObserverProcessor(command, typeCache, triggerCache, settings);
+		processor.start();
 	}
 
 }

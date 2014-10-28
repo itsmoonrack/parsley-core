@@ -37,7 +37,7 @@ public @interface MessageHandler {
 	/**
 	 * The name of the scope this tag should be applied to.
 	 */
-	String scope() default Scope.GLOBAL;
+	String scope() default Scope.GLOBAL_;
 
 	/**
 	 * The type of the messages the receiver wants to handle.
@@ -48,7 +48,6 @@ public @interface MessageHandler {
 	 * An optional selector value to be used in addition to selecting messages by type. Will be checked against the value of the property in the
 	 * message annotated with <code>@Selector</code>.
 	 */
-	//	 * or against the event type if the message is an event and does not have a selector property specified explicitly.
 	String selector() default Selector.NONE;
 
 	/**

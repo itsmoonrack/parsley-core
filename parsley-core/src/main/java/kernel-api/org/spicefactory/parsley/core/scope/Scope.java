@@ -1,5 +1,7 @@
 package org.spicefactory.parsley.core.scope;
 
+import java.lang.annotation.Annotation;
+
 import javax.annotation.Nullable;
 
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
@@ -17,7 +19,16 @@ public interface Scope {
 	 * global application-wide, since you can build disconnected Context hierarchies, although this is a rather rare use case.
 	 * </p>
 	 */
-	final static String GLOBAL = "global";
+	final static String GLOBAL_ = "global";
+
+	/**
+	 * Constant for the global scope.
+	 * <p>
+	 * A global scope spans the entire Context hierarchy and is inherited by each child Context added to the hierarchy. It is not necessarily
+	 * global application-wide, since you can build disconnected Context hierarchies, although this is a rather rare use case.
+	 * </p>
+	 */
+	final static ScopeDefinition GLOBAL = new GlobalScope();
 
 	/**
 	 * Constant for the name of the local scope.
@@ -91,5 +102,29 @@ public interface Scope {
 	 * @param selector the selector to use if it cannot be determined from the message instance itself
 	 */
 	void dispatchMessage(Object message, @Nullable String selector);
+
+	class GlobalScope implements Annotation, ScopeDefinition {
+
+		@Override
+		public String name() {
+			return Scope.GLOBAL_;
+		}
+
+		@Override
+		public boolean inherited() {
+			return true;
+		}
+
+		@Override
+		public String uuid() {
+			return "";
+		}
+
+		@Override
+		public Class<? extends Annotation> annotationType() {
+			return ScopeDefinition.class;
+		}
+
+	}
 
 }
