@@ -4,6 +4,7 @@ import java.awt.Container;
 
 import org.spicefactory.parsley.context.ContextBuilder;
 import org.spicefactory.parsley.core.context.Context;
+import org.spicefactory.parsley.guice.config.GuiceConfig;
 
 import com.google.inject.Module;
 import com.google.inject.Stage;
