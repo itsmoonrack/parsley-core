@@ -28,7 +28,7 @@ class DefaultMessageProcessor implements MessageProcessor {
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	protected DefaultMessageProcessor(Message message, MessageReceiverCache cache, MessageSettings settings) {
+	DefaultMessageProcessor(Message message, MessageReceiverCache cache, MessageSettings settings) {
 		this.cache = cache;
 		this.message = message;
 	}
@@ -46,12 +46,12 @@ class DefaultMessageProcessor implements MessageProcessor {
 	}
 
 	@Override
-	public Message message() {
+	public Message getMessage() {
 		return message;
 	}
 
 	@Override
-	public MessageState state() {
+	public MessageState getState() {
 		return state;
 	}
 
@@ -93,7 +93,7 @@ class DefaultMessageProcessor implements MessageProcessor {
 		if (state == MessageState.CANCELLED) {
 			throw new IllegalStateException("Cannot rewind. Message state is cancelled.");
 		}
-		setState(state(), "Rewind");
+		setState(getState(), "Rewind");
 		createProcessors();
 	}
 
@@ -133,7 +133,7 @@ class DefaultMessageProcessor implements MessageProcessor {
 	}
 
 	protected String getTraceString(String status, int receiverCount) {
-		return MessageFormat.format("{0} message '{1}' with {2} receiver(s).", status, message.type(), receiverCount);
+		return MessageFormat.format("{0} message {1} with {2} receiver(s).", status, message.type(), receiverCount);
 	}
 
 	/**

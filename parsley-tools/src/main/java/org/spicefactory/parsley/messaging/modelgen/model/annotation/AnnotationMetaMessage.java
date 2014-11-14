@@ -22,7 +22,7 @@ public class AnnotationMetaMessage implements MetaMessage {
 	private final Map<String, MetaAttribute> members;
 	private Context context;
 
-	private AccessTypeInformation entityAccessTypeInfo;
+	//	private AccessTypeInformation entityAccessTypeInfo;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Public API.

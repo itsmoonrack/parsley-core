@@ -12,12 +12,12 @@ public interface MessageProcessor {
 	/**
 	 * Returns the message instance.
 	 */
-	Message message();
+	Message getMessage();
 
 	/**
 	 * Returns the current state of this processor.
 	 */
-	MessageState state();
+	MessageState getState();
 
 	/**
 	 * Cancels processing of this message. No further handlers will be invoked and all resources associated with this message are disposed.

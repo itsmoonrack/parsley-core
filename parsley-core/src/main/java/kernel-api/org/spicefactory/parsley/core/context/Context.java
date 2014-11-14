@@ -2,6 +2,7 @@ package org.spicefactory.parsley.core.context;
 
 import javax.annotation.Nullable;
 
+import org.spicefactory.lib.event.EventDispatcher;
 import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.core.view.ViewManager;
 
@@ -10,21 +11,7 @@ import org.spicefactory.parsley.core.view.ViewManager;
  * <p>
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public interface Context {
-
-	/**
-	 * Adds the specified context listener to receive context events from this context. If l is null, no exception is thrown and no action is
-	 * performed.
-	 * @param l
-	 */
-	void addContextListener(ContextListener l);
-
-	/**
-	 * Removes the specified context listener so it no longer receives context events from this context. If l is null, no exception is thrown and
-	 * no action is performed.
-	 * @param l
-	 */
-	void removeContextListener(ContextListener l);
+public interface Context extends EventDispatcher<ContextListener> {
 
 	/**
 	 * Injects dependencies into the fields and methods of {@code instance}. Ignores the presence or absence of an injectable constructor.

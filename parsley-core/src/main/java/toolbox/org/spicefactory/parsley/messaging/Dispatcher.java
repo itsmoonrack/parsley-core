@@ -11,7 +11,7 @@ package org.spicefactory.parsley.messaging;
  * class LoginMessage {
  *     public User user;
  *     public String role;
- *
+ * 
  *     public LoginMessage(User user, String role) {
  *         this.user = user;
  *         this.role = role;
@@ -41,7 +41,7 @@ package org.spicefactory.parsley.messaging;
  * pass any kind of object to this dispatcher function.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public abstract class Dispatcher {
+public interface Dispatcher {
 
 	/**
 	 * Dispatches the specified message through the ScopeManager associated with this reference.
@@ -49,14 +49,12 @@ public abstract class Dispatcher {
 	 * @param selector the selector to use if it cannot be determined from the message instance itself
 	 */
 	// Delegated to dispatchMessage method on concrete MessageDispatcher instance.
-	public abstract void dispatchMessage(Object message, String selector);
+	void dispatchMessage(Object message, String selector);
 
 	/**
 	 * Dispatches the specified message through the ScopeManager associated with this reference.
 	 * @param message the message to dispatch
 	 */
-	public void dispatchMessage(Object message) {
-		dispatchMessage(message, null);
-	}
+	void dispatchMessage(Object message);
 
 }

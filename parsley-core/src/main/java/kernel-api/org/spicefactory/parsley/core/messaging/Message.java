@@ -11,7 +11,7 @@ public interface Message {
 	/**
 	 * Returns actual message instance.
 	 */
-	Object instance();
+	Object getInstance();
 
 	/**
 	 * Returns type of the message.

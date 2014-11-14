@@ -27,7 +27,7 @@ public @interface ScopeDefinition {
 	boolean inherited() default true;
 
 	/**
-	 * The unique id of this scope. See {@link Scope#uuid()} method for details.
+	 * The unique id of this scope. See {@link Scope#getUuid()} method for details.
 	 */
 	String uuid() default "";
 

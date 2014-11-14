@@ -28,22 +28,22 @@ public class DefaultScope implements Scope {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return info.name();
 	}
 
 	@Override
-	public String uuid() {
+	public String getUuid() {
 		return info.uuid();
 	}
 
 	@Override
-	public boolean inherited() {
+	public boolean isInherited() {
 		return info.inherited();
 	}
 
 	@Override
-	public MessageReceiverRegistry messageReceivers() {
+	public MessageReceiverRegistry getMessageReceivers() {
 		return info.messageReceivers();
 	}
 
@@ -58,7 +58,7 @@ public class DefaultScope implements Scope {
 		final Message message = new DefaultMessage(instance, type, selector);
 
 		if (cache.getReceivers(MessageReceiverKind.TARGET, message.selector()).size() == 0) {
-			logger.warn("Discarding message '{}' for scope '{}': no matching receiver.", instance.getClass(), name());
+			logger.warn("Discarding message '{}' for scope '{}': no matching receiver.", instance.getClass(), getName());
 			return;
 		}
 

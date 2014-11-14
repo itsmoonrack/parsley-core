@@ -16,7 +16,7 @@ public interface MessageReceiver {
 	/**
 	 * An optional selector value to be used for selecting matching messages.
 	 */
-	String selector();
+	Object selector();
 
 	/**
 	 * The execution order for this receiver.

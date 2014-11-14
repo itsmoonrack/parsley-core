@@ -11,7 +11,7 @@ import org.spicefactory.parsley.core.scope.ScopeManager;
  * Represents a reference to a message dispatcher function. To be used in FXML and XML configuration.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-class MessageDispatcher extends Dispatcher {
+class MessageDispatcher implements Dispatcher {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -31,6 +31,11 @@ class MessageDispatcher extends Dispatcher {
 		this.scopeManager = scopeManager;
 		this.scope = scope;
 		this.owner = owner;
+	}
+
+	@Override
+	public void dispatchMessage(Object message) {
+		dispatchMessage(message, null);
 	}
 
 	@Override

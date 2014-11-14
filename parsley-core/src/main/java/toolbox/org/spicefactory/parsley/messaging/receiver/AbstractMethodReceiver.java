@@ -4,15 +4,13 @@ import java.lang.reflect.Method;
 
 import javax.inject.Provider;
 
-import org.spicefactory.parsley.messaging.annotation.MessageHandler;
-
 public abstract class AbstractMethodReceiver extends AbstractProviderReceiver implements MethodReceiver {
 
 	/**
 	 * Creates a new instance.
 	 * @param info the mapping information for this receiver
 	 */
-	public AbstractMethodReceiver(MessageHandler info) {
+	public AbstractMethodReceiver(MessageReceiverInfo info) {
 		super(info);
 	}
 

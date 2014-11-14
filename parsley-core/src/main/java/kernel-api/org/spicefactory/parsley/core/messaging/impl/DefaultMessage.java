@@ -25,7 +25,7 @@ public final class DefaultMessage implements Message {
 	}
 
 	@Override
-	public Object instance() {
+	public Object getInstance() {
 		return instance;
 	}
 

@@ -12,7 +12,6 @@ import javax.inject.Provider;
 
 import org.spicefactory.parsley.core.messaging.MessageProcessor;
 import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
-import org.spicefactory.parsley.messaging.annotation.MessageHandler;
 
 class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTarget {
 
@@ -24,9 +23,9 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 	 * Creates a new instance.
 	 * @param info the mapping information for the receiver
 	 */
-	DefaultMessageHandler(MessageHandler info) {
+	DefaultMessageHandler(MessageReceiverInfo info, String[] messagesProperties) {
 		super(info);
-		this.messageProperties = info.messagesProperties();
+		this.messageProperties = messagesProperties;
 
 	}
 
@@ -136,14 +135,14 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 					if (MessageProcessor.class.isAssignableFrom(targetMethod.getParameterTypes()[0])) {
 						args.add(processor);
 					} else {
-						args.add(processor.message().instance());
+						args.add(processor.getMessage().getInstance());
 					}
 				}
 				if (count >= 2) {
 					if (targetMethod.getParameterTypes()[1].equals(MessageProcessor.class)) {
 						args.add(processor);
 					} else {
-						args.add(processor.message().selector());
+						args.add(processor.getMessage().selector());
 						if (count == 3) {
 							args.add(processor);
 						}
@@ -152,7 +151,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 			} else {
 				for (Field field : messageFields) {
 					field.setAccessible(true);
-					args.add(field.get(processor.message().instance()));
+					args.add(field.get(processor.getMessage().getInstance()));
 				}
 				if (targetMethod.getParameterTypes().length > args.size()) {
 					args.add(processor);

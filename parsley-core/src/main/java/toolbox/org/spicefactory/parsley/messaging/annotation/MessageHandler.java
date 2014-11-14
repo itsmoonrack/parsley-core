@@ -11,18 +11,33 @@ import org.spicefactory.parsley.core.messaging.Selector;
 import org.spicefactory.parsley.core.scope.Scope;
 
 /**
- * Message Handlers are the most common approach for the receiving side. You can declare methods to be invoked when a particular application
- * message gets dispatched. In the most simple case the method will simply be selected by parameter type:
+ * Message Handlers are the most common approach for the receiving side. You can declare methods to be invoked on @Singleton instances when a
+ * particular application message gets dispatched. In the most simple case the method will simply be selected by parameter type:
  * <p>
  * <b> Annotation example </b>
  * <p>
- * <code>@MessageHandler private void handleLogin(LoginMessage message) {</code>
+ *
+ * <pre>
+ * <code>@MessageHandler
+ * protected void handleLogin(LoginMessage message) {
+ * </code>
+ * </pre>
  * <p>
- * In this case the method will be invoked whenever a message of a matching type (or sub-type) gets dispatched.
+ * In this case the method will be invoked whenever a message of a matching type (or sub-type) gets dispatched. The recommended visibility for
+ * such methods is protected so it remain testable by sub-classes and its not exposed as public so clients of the receiving class can not
+ * triggers the method by direct call.
  * <p>
  * There is also a variant where you split properties of the message class to arguments of the message handler method:
  * <p>
- * <code>@MessageHandler(type = LoginMessage.class, messageProperties = {"user", "roles"}) private void handleLogin(User user, Role role) {</code>
+ *
+ * <pre>
+ * <code>@MessageHandler(type = LoginMessage.class, messageProperties = {"user", "roles"})
+ * public void handleLogin(User user, Role role) {
+ * </code>
+ * </pre>
+ * <p>
+ * This is useful for public API methods implementing an interface which does not depends on your domain messages but instead plain objects as it
+ * would be recommended in most software engineering books.
  * <p>
  * Finally you may encounter a situation where selection by message type is not sufficient. If you dispatch the same message type in different
  * scenarios and application states you may want to further refine the message selection process.

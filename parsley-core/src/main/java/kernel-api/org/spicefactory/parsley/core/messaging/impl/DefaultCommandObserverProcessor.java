@@ -12,7 +12,7 @@ import org.spicefactory.parsley.core.messaging.MessageSettings;
 import org.spicefactory.parsley.core.messaging.receiver.CommandObserver;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
 
-public class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements CommandObserverProcessor {
+class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements CommandObserverProcessor {
 
 	private Object result;
 	private CommandStatus status;
@@ -21,10 +21,10 @@ public class DefaultCommandObserverProcessor extends DefaultMessageProcessor imp
 	private final MessageReceiverCache typeCache;
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Public API.
+	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	public DefaultCommandObserverProcessor(ObservableCommand observable, MessageReceiverCache typeCache, MessageReceiverCache triggerCache,
+	DefaultCommandObserverProcessor(ObservableCommand observable, MessageReceiverCache typeCache, MessageReceiverCache triggerCache,
 			MessageSettings settings) {
 		super(observable.trigger(), triggerCache, settings);
 
@@ -33,6 +33,10 @@ public class DefaultCommandObserverProcessor extends DefaultMessageProcessor imp
 		this.status = observable.status();
 		this.result = observable.result();
 	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public Object command() {
@@ -69,8 +73,7 @@ public class DefaultCommandObserverProcessor extends DefaultMessageProcessor imp
 
 	@Override
 	protected List<MessageReceiver> fetchReceivers() {
-		List<MessageReceiver> receivers =
-				typeCache.getReceivers(MessageReceiverKind.forCommandStatus(commandStatus(), false), observable.id());
+		List<MessageReceiver> receivers = typeCache.getReceivers(MessageReceiverKind.forCommandStatus(commandStatus(), false), observable.id());
 
 		if (observable.trigger() != null) {
 			receivers.addAll(cache.getReceivers(MessageReceiverKind.forCommandStatus(commandStatus(), true), observable.trigger().selector()));

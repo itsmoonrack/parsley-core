@@ -41,7 +41,7 @@ public interface Scope {
 	/**
 	 * The name of the scope.
 	 */
-	String name();
+	String getName();
 
 	/**
 	 * The unique id of this scope.
@@ -53,12 +53,12 @@ public interface Scope {
 	 * </p>
 	 * The uid may be used to identify persistent published values or to explicitly route messages. </p>
 	 */
-	String uuid();
+	String getUuid();
 
 	/**
 	 * Indicates whether this scope will be inherited by child Contexts.
 	 */
-	boolean inherited();
+	boolean isInherited();
 
 	//
 	//	/**
@@ -69,7 +69,7 @@ public interface Scope {
 	/**
 	 * The registry for receivers of application messages dispatched through this scope.
 	 */
-	MessageReceiverRegistry messageReceivers();
+	MessageReceiverRegistry getMessageReceivers();
 
 	//	/**
 	//	 * The manager for active asynchronous commands in this scope.

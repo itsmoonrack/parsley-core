@@ -43,7 +43,7 @@ public class DefaultViewManager implements ViewManager, ContainerListener, Conte
 	@Inject
 	DefaultViewManager(Context c, @Nullable ViewSettings s) {
 		context = c;
-		context.addContextListener(this);
+		context.addEventListener(ContextEvent.DESTROYED, this);
 
 		settings = s;
 
@@ -139,8 +139,8 @@ public class DefaultViewManager implements ViewManager, ContainerListener, Conte
 	///////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void contextDestroyed(ContextEvent e) {
-		context.removeContextListener(this);
+	public void process(ContextEvent event) {
+		context.removeEventListener(ContextEvent.DESTROYED, this);
 		for (ViewRoot viewRoot : viewRoots.values()) {
 			removeViewRoot(viewRoot);
 		}

@@ -1,8 +1,7 @@
 package org.spicefactory.parsley.core.view;
 
-import java.util.EventListener;
-
 import org.spicefactory.lib.event.EventDispatcher;
+import org.spicefactory.lib.event.EventListener;
 import org.spicefactory.parsley.core.context.Context;
 
 /**
@@ -21,7 +20,7 @@ import org.spicefactory.parsley.core.context.Context;
  * </p>
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public interface ViewLifecycle extends EventDispatcher<EventListener> {
+public interface ViewLifecycle extends EventDispatcher<EventListener<?>> {
 
 	/**
 	 * Starts controlling the life-cycle of the view instance contained in the specified configuration instance. The primary purpose of this

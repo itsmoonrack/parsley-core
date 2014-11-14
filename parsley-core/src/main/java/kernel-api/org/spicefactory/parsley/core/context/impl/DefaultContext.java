@@ -26,9 +26,9 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 		this.parents = parents;
 		this.viewManager = viewManager;
 
-		addContextListener(this);
+		addEventListener(ContextEvent.DESTROYED, this);
 		for (Context p : parents) {
-			p.addContextListener(new ParentContextListener());
+			p.addEventListener(ContextEvent.DESTROYED, new ParentContextListener());
 		}
 	}
 
@@ -68,16 +68,6 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 
 		}
 
-	}
-
-	@Override
-	public void addContextListener(ContextListener l) {
-		addEventListener(ContextEvent.DESTROYED, l);
-	}
-
-	@Override
-	public void removeContextListener(ContextListener l) {
-		removeEventListener(ContextEvent.DESTROYED, l);
 	}
 
 	@Override

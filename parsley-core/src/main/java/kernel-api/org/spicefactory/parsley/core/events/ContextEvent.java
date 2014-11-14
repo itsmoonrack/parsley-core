@@ -16,8 +16,8 @@ public class ContextEvent extends Event {
 	 */
 	public static final int DESTROYED = 0x08;
 
-	public ContextEvent(Context source, int type) {
-		super(source, type);
+	public ContextEvent(int type) {
+		super(type);
 	}
 
 	public Context getContext() {
