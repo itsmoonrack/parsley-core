@@ -13,7 +13,9 @@ import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.messaging.GuiceMessageDispatcherMembersInjector;
 import org.spicefactory.parsley.messaging.annotation.MessageDispatcher;
 import org.spicefactory.parsley.messaging.annotation.MessageHandler;
+import org.spicefactory.parsley.messaging.annotation.MessageHandlers;
 import org.spicefactory.parsley.messaging.receiver.GuiceMessageReceiverInjectionListener;
+import org.spicefactory.parsley.messaging.receiver.GuiceMessagesReceiverInjectionListener;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
@@ -48,9 +50,14 @@ public class GuiceParsleyTypeListener implements TypeListener {
 			}
 			// Registers an injection listener on methods annotated with @MessageHandler
 			// so MessageRouter can dispatch messages to this singleton instance.
-			for (Method method : c.getDeclaredMethods()) {
-				if (method.isAnnotationPresent(MessageHandler.class) && type.getRawType().isAnnotationPresent(Singleton.class)) {
-					encounter.register(new GuiceMessageReceiverInjectionListener(encounter.getProvider(ScopeManager.class), method));
+			if (type.getRawType().isAnnotationPresent(Singleton.class)) {
+				for (Method method : c.getDeclaredMethods()) {
+					if (method.isAnnotationPresent(MessageHandler.class)) {
+						encounter.register(new GuiceMessageReceiverInjectionListener(encounter.getProvider(ScopeManager.class), method));
+					}
+					if (method.isAnnotationPresent(MessageHandlers.class)) {
+						encounter.register(new GuiceMessagesReceiverInjectionListener(encounter.getProvider(ScopeManager.class), method));
+					}
 				}
 			}
 			c = c.getSuperclass();

@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Provider;
+import javax.swing.SwingUtilities;
 
 import org.spicefactory.parsley.core.messaging.MessageProcessor;
 import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
@@ -26,7 +27,6 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 	DefaultMessageHandler(MessageReceiverInfo info, String[] messagesProperties) {
 		super(info);
 		this.messageProperties = messagesProperties;
-
 	}
 
 	@Override

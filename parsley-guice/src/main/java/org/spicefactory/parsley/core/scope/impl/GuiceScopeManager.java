@@ -32,7 +32,7 @@ import org.spicefactory.parsley.core.scope.ScopeManager;
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
 @Singleton
-class GuiceScopeManager implements ScopeManager {
+public class GuiceScopeManager implements ScopeManager {
 
 	private final Logger logger = LoggerFactory.getLogger(GuiceScopeManager.class);
 

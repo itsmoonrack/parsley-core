@@ -1,15 +1,24 @@
 package org.spicefactory.parsley;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.spicefactory.parsley.command.MappedCommandBuilder;
-import org.spicefactory.parsley.core.command.impl.GuiceCommandConfig;
-import org.spicefactory.parsley.core.context.impl.GuiceContextConfig;
+import org.spicefactory.parsley.core.command.CommandManager;
+import org.spicefactory.parsley.core.command.impl.DefaultCommandManager;
+import org.spicefactory.parsley.core.context.Context;
+import org.spicefactory.parsley.core.context.impl.GuiceContext;
+import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
 import org.spicefactory.parsley.core.messaging.MessageSettings;
-import org.spicefactory.parsley.core.messaging.impl.GuiceMessagingConfig;
+import org.spicefactory.parsley.core.messaging.impl.DefaultMessageReceiverRegistry;
 import org.spicefactory.parsley.core.scope.Scope;
 import org.spicefactory.parsley.core.scope.ScopeDefinition;
-import org.spicefactory.parsley.core.scope.impl.GuiceScopeConfig;
+import org.spicefactory.parsley.core.scope.ScopeInfo;
+import org.spicefactory.parsley.core.scope.ScopeInfoRegistry;
+import org.spicefactory.parsley.core.scope.ScopeManager;
+import org.spicefactory.parsley.core.scope.impl.DefaultScopeInfoRegistry;
+import org.spicefactory.parsley.core.scope.impl.GuiceScopeInfo;
+import org.spicefactory.parsley.core.scope.impl.GuiceScopeManager;
 import org.spicefactory.parsley.core.view.ViewSettings;
 import org.spicefactory.parsley.view.FastInject;
 
@@ -32,13 +41,28 @@ public class GuiceParsleyConfig extends AbstractModule {
 		bindListener(new NoComponentMatcher(), listener);
 
 		// Binds infrastructure (framework) services.
-		install(new GuiceCommandConfig());
-		install(new GuiceContextConfig());
-		install(new GuiceMessagingConfig());
-		install(new GuiceScopeConfig());
+		bind(CommandManager.class).to(DefaultCommandManager.class);
+		bind(Context.class).to(GuiceContext.class);
+		bind(MessageReceiverRegistry.class).to(DefaultMessageReceiverRegistry.class);
+		bind(ScopeInfoRegistry.class).to(DefaultScopeInfoRegistry.class);
+		bind(ScopeManager.class).to(GuiceScopeManager.class);
 
 		// Fast static injection for view classes.
 		requestStaticInjection(FastInject.class);
+	}
+
+	@Provides
+	protected List<ScopeDefinition> newScopes() {
+		return new LinkedList<ScopeDefinition>();
+	}
+
+	@Provides
+	protected List<ScopeInfo> parentScopes(CommandManager commandManager) {
+		// TODO: Scopes are hard-coded here. Should create a scope per Module, Scope.LOCAL,
+		// and possibility to add more. Also check the inherited property.
+		List<ScopeInfo> parentScopes = new LinkedList<ScopeInfo>();
+		parentScopes.add(new GuiceScopeInfo(Scope.GLOBAL, commandManager));
+		return parentScopes;
 	}
 
 	@Provides

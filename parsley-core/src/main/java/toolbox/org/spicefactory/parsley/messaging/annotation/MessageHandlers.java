@@ -13,13 +13,21 @@ import java.lang.annotation.Target;
  * <p>
  * <b> Annotation example </b>
  * <p>
- * <code>@MessageHandler private void handleLogin(LoginMessage message) {</code>
+ *
+ * <pre>
+ * <code>@MessageHandler
+ * protected void handleLogin(LoginMessage message) {</code>
+ * </pre>
  * <p>
  * In this case the method will be invoked whenever a message of a matching type (or sub-type) gets dispatched.
  * <p>
  * There is also a variant where you split properties of the message class to arguments of the message handler method:
  * <p>
- * <code>@MessageHandler(type = LoginMessage.class, messageProperties = {"user", "roles"}) private void handleLogin(User user, Role role) {</code>
+ * 
+ * <pre>
+ * <code>@MessageHandler(type = LoginMessage.class, messageProperties = {"user", "roles"})
+ * protected void handleLogin(User user, Role role) {</code>
+ * </pre>
  * <p>
  * Finally you may encounter a situation where selection by message type is not sufficient. If you dispatch the same message type in different
  * scenarios and application states you may want to further refine the message selection process.

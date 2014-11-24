@@ -14,7 +14,7 @@ import org.spicefactory.parsley.core.messaging.Selector;
  * Default implementation of the CommandManager interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public class GuiceCommandManager implements CommandManager, CommandObserver {
+public class DefaultCommandManager implements CommandManager, CommandObserver {
 
 	private final List<ObservableCommand> commands = new ArrayList<ObservableCommand>();
 

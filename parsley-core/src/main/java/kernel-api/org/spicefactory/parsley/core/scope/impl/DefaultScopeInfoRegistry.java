@@ -11,7 +11,7 @@ import org.spicefactory.parsley.core.scope.ScopeInfo;
 import org.spicefactory.parsley.core.scope.ScopeInfoRegistry;
 
 @Singleton
-class DefaultScopeInfoRegistry implements ScopeInfoRegistry {
+public class DefaultScopeInfoRegistry implements ScopeInfoRegistry {
 
 	@Inject
 	DefaultScopeInfoRegistry(List<ScopeDefinition> newScopes, List<ScopeInfo> parentScopes) {

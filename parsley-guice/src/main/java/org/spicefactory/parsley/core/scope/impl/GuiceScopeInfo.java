@@ -2,7 +2,7 @@ package org.spicefactory.parsley.core.scope.impl;
 
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.ObservableCommand;
-import org.spicefactory.parsley.core.command.impl.GuiceCommandManager;
+import org.spicefactory.parsley.core.command.impl.DefaultCommandManager;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
@@ -14,13 +14,13 @@ import org.spicefactory.parsley.core.scope.ScopeInfo;
  * Default implementation of the ScopeInfo interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-class GuiceScopeInfo implements ScopeInfo {
+public class GuiceScopeInfo implements ScopeInfo {
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	GuiceScopeInfo(ScopeDefinition definition, CommandManager commandManager /*, BootstrapInfo info*/) {
+	public GuiceScopeInfo(ScopeDefinition definition, CommandManager commandManager /*, BootstrapInfo info*/) {
 		this.name = definition.name();
 		this.uuid = definition.uuid();
 		this.inherited = definition.inherited();
@@ -78,7 +78,7 @@ class GuiceScopeInfo implements ScopeInfo {
 
 	@Override
 	public void addActiveCommand(ObservableCommand command) {
-		((GuiceCommandManager) commandManager).addActiveCommand(command);
+		((DefaultCommandManager) commandManager).addActiveCommand(command);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////

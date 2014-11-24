@@ -101,8 +101,8 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 				}
 			}
 			catch (Exception e) {
-				logger.debug("An exception has been raised in command. {}", e);
-				result = DefaultCommandResult.forException(target, e);
+				logger.debug("An exception has been raised in command.", e.getCause());
+				result = DefaultCommandResult.forException(target, e.getCause());
 			}
 			finally {
 				lifecycle.afterCompletion(target, result);
