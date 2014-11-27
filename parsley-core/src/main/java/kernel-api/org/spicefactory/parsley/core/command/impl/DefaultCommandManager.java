@@ -3,8 +3,6 @@ package org.spicefactory.parsley.core.command.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.ObservableCommand;
 import org.spicefactory.parsley.core.command.ObservableCommand.CommandObserver;
@@ -41,7 +39,7 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public boolean hasActiveCommandsForTrigger(Class<?> messageType, String selector) {
+	public boolean hasActiveCommandsForTrigger(Class<?> messageType, int selector) {
 		for (ObservableCommand command : commands) {
 			if (matchesByTrigger(command, messageType, selector)) {
 				return true;
@@ -51,17 +49,7 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	}
 
 	@Override
-	public boolean hasActiveCommandsOfType(Class<?> commandType, String name) {
-		for (ObservableCommand command : commands) {
-			if (matchesByType(command, commandType, name)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, String selector) {
+	public List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, int selector) {
 		List<ObservableCommand> result = new ArrayList<ObservableCommand>();
 		for (ObservableCommand command : commands) {
 			if (matchesByTrigger(command, messageType, selector)) {
@@ -72,26 +60,23 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	}
 
 	@Override
-	public List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, String name) {
-		List<ObservableCommand> result = new ArrayList<ObservableCommand>();
-		for (ObservableCommand command : commands) {
-			if (matchesByType(command, commandType, name)) {
-				result.add(command);
-			}
-		}
-		return result;
+	public boolean hasActiveCommandsOfType(Class<?> commandType, int id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, int id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, @Nullable String selector) {
+	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, int selector) {
 		return (command.trigger() != null && messageType.isAssignableFrom(command.trigger().getInstance().getClass()) && (selector == Selector.NONE || selector == command
 				.trigger().selector()));
-	}
-
-	private boolean matchesByType(ObservableCommand command, Class<?> commandType, @Nullable String name) {
-		return (commandType.isAssignableFrom(command.command().getClass()) && (name == null || name == command.id()));
 	}
 }

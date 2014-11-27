@@ -24,7 +24,7 @@ class ManagedCommandLifecycle implements CommandLifecycle {
 	private final Map<Object, DefaultObservableCommand> observables;
 
 	private boolean root = true;
-	private String nextId;
+	private int nextId;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
@@ -78,7 +78,7 @@ class ManagedCommandLifecycle implements CommandLifecycle {
 	private ObservableCommand createObservableCommand(Object command) {
 		DefaultObservableCommand observable = new DefaultObservableCommand(command, command.getClass(), nextId, root);
 		root = false;
-		nextId = null;
+		nextId = -1;
 		observables.put(command, observable);
 		return observable;
 	}
@@ -88,13 +88,13 @@ class ManagedCommandLifecycle implements CommandLifecycle {
 		private final Object command;
 		private final Class<?> type;
 		private final boolean root;
-		private final String id;
+		private final int id;
 		private final List<CommandObserver> callbacks;
 
 		private Object result;
 		private CommandStatus status;
 
-		public DefaultObservableCommand(Object command, Class<?> type, String id, boolean root) {
+		public DefaultObservableCommand(Object command, Class<?> type, int id, boolean root) {
 			this.command = command;
 			this.type = type;
 			this.root = root;
@@ -114,7 +114,7 @@ class ManagedCommandLifecycle implements CommandLifecycle {
 		}
 
 		@Override
-		public String id() {
+		public int id() {
 			return id;
 		}
 

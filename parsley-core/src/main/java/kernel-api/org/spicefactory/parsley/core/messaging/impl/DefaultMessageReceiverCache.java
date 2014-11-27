@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.Nullable;
-
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.Selector;
@@ -33,7 +31,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 		this.messageType = type;
 		this.collections = collections;
 		this.selectorMaps = new ConcurrentHashMap<MessageReceiverKind, SelectorMap>();
-		this.selectorField = getSelectorField(type.getFields());
+		this.selectorField = getSelectorField(type);
 	}
 
 	/**
@@ -53,23 +51,22 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public List<MessageReceiver> getReceivers(MessageReceiverKind kind, String selector) {
+	public List<MessageReceiver> getReceivers(MessageReceiverKind kind, int selector) {
 		return getSelectorMap(kind).getReceivers(selector, messageType.getClassLoader());
 	}
 
 	@Override
-	public String getSelectorValue(Object message) {
+	public int getSelectorValue(Object message) {
 		if (selectorField != null) {
 			selectorField.setAccessible(true);
 			try {
-				return (String) selectorField.get(message);
+				return (Integer) selectorField.get(message);
 			}
 			catch (Exception e) {
 				// Ignores returns null.
 			}
 		}
-
-		return null;
+		return Selector.NONE;
 	}
 
 	/**
@@ -106,12 +103,18 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 		return selectorMap;
 	}
 
-	private Field getSelectorField(Field[] fields) {
-		for (Field field : fields) {
-			if (field.isAnnotationPresent(Selector.class)) {
-				return field;
+	private Field getSelectorField(Class<?> type) {
+		Class<?> c = type;
+
+		while (c.getSuperclass() != null) {
+			for (Field field : c.getDeclaredFields()) {
+				if (field.isAnnotationPresent(Selector.class)) {
+					return field;
+				}
 			}
+			c = c.getSuperclass();
 		}
+
 		return null;
 	}
 
@@ -139,15 +142,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 			this.cache = new HashMap<Object, List<MessageReceiver>>();
 		}
 
-		public List<MessageReceiver> getReceivers(@Nullable String selector, ClassLoader loader) {
-			if (selector == null || selector.getClass().isPrimitive()) {
-				return getReceiversBySelectorValue(selector);
-			} else {
-				return getReceiversBySelectorType(selector, loader);
-			}
-		}
-
-		private List<MessageReceiver> getReceiversBySelectorValue(String selector) {
+		public List<MessageReceiver> getReceivers(int selector, ClassLoader loader) {
 			List<MessageReceiver> receivers = cache.get(selector);
 
 			if (receivers == null) {
@@ -160,10 +155,6 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 			}
 
 			return receivers;
-		}
-
-		private List<MessageReceiver> getReceiversBySelectorType(String selector, ClassLoader loader) {
-			return null;
 		}
 	}
 

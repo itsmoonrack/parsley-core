@@ -40,7 +40,7 @@ public @interface CommandException {
 	 * An optional selector value to be used in addition to selecting messages by type. Will be checked against the value of the property in the
 	 * message annotated with <code>@Selector</code>.
 	 */
-	String selector() default Selector.NONE;
+	int selector() default Selector.NONE;
 
 	/**
 	 * The execution order for this receiver. Will be processed in ascending order.

@@ -117,7 +117,7 @@ class DefaultMessageProcessor implements MessageProcessor {
 
 	private void createProcessors() {
 		currentProcessor = new Processor(fetchReceivers());
-		remainingProcessors = new ArrayList<DefaultMessageProcessor.Processor>();
+		remainingProcessors = new ArrayList<Processor>();
 	}
 
 	/**

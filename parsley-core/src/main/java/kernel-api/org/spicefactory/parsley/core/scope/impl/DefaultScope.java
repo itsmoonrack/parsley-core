@@ -7,6 +7,7 @@ import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
 import org.spicefactory.parsley.core.messaging.MessageRouter;
+import org.spicefactory.parsley.core.messaging.Selector;
 import org.spicefactory.parsley.core.messaging.impl.DefaultMessage;
 import org.spicefactory.parsley.core.scope.Scope;
 import org.spicefactory.parsley.core.scope.ScopeInfo;
@@ -48,11 +49,11 @@ public class DefaultScope implements Scope {
 	}
 
 	@Override
-	public void dispatchMessage(Object instance, String selector) {
+	public void dispatchMessage(Object instance, int selector) {
 		final Class<?> type = instance.getClass();
 		final MessageReceiverCache cache = info.getMessageReceiverCache(type);
 
-		if (selector == null) {
+		if (selector == Selector.NONE) {
 			selector = cache.getSelectorValue(instance);
 		}
 		final Message message = new DefaultMessage(instance, type, selector);

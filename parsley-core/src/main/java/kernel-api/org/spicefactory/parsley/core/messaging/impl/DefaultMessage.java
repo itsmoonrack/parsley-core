@@ -1,8 +1,7 @@
 package org.spicefactory.parsley.core.messaging.impl;
 
-import javax.annotation.Nullable;
-
 import org.spicefactory.parsley.core.messaging.Message;
+import org.spicefactory.parsley.core.messaging.Selector;
 
 /**
  * Default implementation of the Message interface.
@@ -12,13 +11,13 @@ public final class DefaultMessage implements Message {
 
 	private final Object instance;
 	private final Class<?> type;
-	private final String selector;
+	private final int selector;
 
 	public DefaultMessage(Object instance, Class<?> type) {
-		this(instance, type, null);
+		this(instance, type, Selector.NONE);
 	}
 
-	public DefaultMessage(Object instance, Class<?> type, @Nullable String selector) {
+	public DefaultMessage(Object instance, Class<?> type, int selector) {
 		this.instance = instance;
 		this.type = type;
 		this.selector = selector;
@@ -35,7 +34,7 @@ public final class DefaultMessage implements Message {
 	}
 
 	@Override
-	public String selector() {
+	public int selector() {
 		return selector;
 	}
 

@@ -1,6 +1,5 @@
 package org.spicefactory.parsley.core.messaging;
 
-import javax.annotation.Nullable;
 
 /**
  * Represents a single message and all its relevant settings.
@@ -21,7 +20,6 @@ public interface Message {
 	/**
 	 * Returns selector to use to determine matching receivers.
 	 */
-	@Nullable
-	String selector();
+	int selector();
 
 }

@@ -2,8 +2,6 @@ package org.spicefactory.parsley.core.scope;
 
 import java.lang.annotation.Annotation;
 
-import javax.annotation.Nullable;
-
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
 
 /**
@@ -101,7 +99,7 @@ public interface Scope {
 	 * @param message the message to dispatch
 	 * @param selector the selector to use if it cannot be determined from the message instance itself
 	 */
-	void dispatchMessage(Object message, @Nullable String selector);
+	void dispatchMessage(Object message, int selector);
 
 	class GlobalScope implements Annotation, ScopeDefinition {
 

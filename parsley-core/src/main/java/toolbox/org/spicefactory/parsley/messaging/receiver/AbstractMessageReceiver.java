@@ -8,7 +8,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver {
 	 * The receiver configuration in three (mutable) model object.
 	 */
 	protected Class<?> type;
-	protected Object selector;
+	protected int selector;
 	protected int order;
 
 	public AbstractMessageReceiver(MessageReceiverInfo info) {
@@ -23,7 +23,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver {
 	}
 
 	@Override
-	public Object selector() {
+	public int selector() {
 		return selector;
 	}
 

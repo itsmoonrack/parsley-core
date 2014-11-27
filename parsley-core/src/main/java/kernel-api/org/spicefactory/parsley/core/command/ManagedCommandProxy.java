@@ -11,5 +11,5 @@ public interface ManagedCommandProxy extends CommandProxy {
 	/**
 	 * The id the command is registered with in the Context.
 	 */
-	String getID();
+	int getID();
 }

@@ -2,8 +2,6 @@ package org.spicefactory.parsley.core.command;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 /**
  * Responsible for managing all active commands for a single scope.
  * <p>
@@ -18,7 +16,7 @@ public interface CommandManager {
 	 * @param selector the selector of the message that triggered the commands
 	 * @return true if there is at least one matching command in this scope.
 	 */
-	boolean hasActiveCommandsForTrigger(Class<?> messageType, @Nullable String selector);
+	boolean hasActiveCommandsForTrigger(Class<?> messageType, int selector);
 
 	/**
 	 * Indicates whether this scope has any active commands that matches the specified command type and id.
@@ -26,7 +24,7 @@ public interface CommandManager {
 	 * @param name the name the command is registered with in the Context
 	 * @return true if there is at least one matching command in this scope.
 	 */
-	boolean hasActiveCommandsOfType(Class<?> commandType, @Nullable String name);
+	boolean hasActiveCommandsOfType(Class<?> commandType, int id);
 
 	/**
 	 * Returns all active commands triggered by a message that matches the specified type and selector in this scope.
@@ -34,7 +32,7 @@ public interface CommandManager {
 	 * @param selector the selector of the message that triggered the commands
 	 * @return all matching ObservableCommand instances.
 	 */
-	List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, @Nullable String selector);
+	List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, int selector);
 
 	/**
 	 * Returns all active commands of the specified type.
@@ -44,6 +42,6 @@ public interface CommandManager {
 	 * @param name the name the command is registered with in the Context
 	 * @return all matching ObservableCommand instances
 	 */
-	List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, @Nullable String name);
+	List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, int id);
 
 }

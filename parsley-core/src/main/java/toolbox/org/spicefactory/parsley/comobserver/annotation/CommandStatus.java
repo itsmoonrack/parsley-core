@@ -44,6 +44,6 @@ public @interface CommandStatus {
 	 * An optional selector value to be used in addition to selecting messages by type. Will be checked against the value of the property in the
 	 * message annotated with <code>@Selector</code>.
 	 */
-	String selector() default Selector.NONE;
+	int selector() default Selector.NONE;
 
 }

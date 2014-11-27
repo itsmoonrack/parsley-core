@@ -42,7 +42,7 @@ public @interface MapCommand {
 	/**
 	 * The optional selector for mapping matching messages.
 	 */
-	String selector() default Selector.NONE;
+	int selector() default Selector.NONE;
 
 	/**
 	 * The execution order in relation to other message receivers.

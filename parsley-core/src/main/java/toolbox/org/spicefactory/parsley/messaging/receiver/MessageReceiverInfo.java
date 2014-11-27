@@ -32,7 +32,7 @@ public class MessageReceiverInfo {
 	 * message is an event and does not have a selector property specified explicitly.
 	 * </p>
 	 */
-	public Object selector;
+	public int selector;
 
 	/**
 	 * The execution order for this receiver. Will be processed in ascending order.

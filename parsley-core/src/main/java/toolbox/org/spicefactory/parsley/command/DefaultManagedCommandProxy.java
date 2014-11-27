@@ -12,7 +12,7 @@ import org.spicefactory.parsley.core.context.Context;
 
 public class DefaultManagedCommandProxy extends AbstractCommandExecutor implements ManagedCommandProxy {
 
-	private String id;
+	private int id;
 	private Class<?> type;
 	private Command target;
 	private final Context context;
@@ -26,7 +26,7 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 	 * @param context the Context the command belongs to
 	 */
 	DefaultManagedCommandProxy(@Nullable Context context) {
-		this(context, null, null);
+		this(context, null, -1);
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 	 * @param target the target command to be executed by this proxy
 	 */
 	DefaultManagedCommandProxy(@Nullable Context context, @Nullable Command command) {
-		this(context, command, null);
+		this(context, command, -1);
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 	 * @param target the target command to be executed by this proxy
 	 * @param id the id the command is registered with in the Context
 	 */
-	DefaultManagedCommandProxy(@Nullable Context context, @Nullable Command command, @Nullable String id) {
+	DefaultManagedCommandProxy(@Nullable Context context, @Nullable Command command, int id) {
 		this.id = id;
 		this.target = command;
 		this.context = context;
@@ -82,7 +82,7 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 	}
 
 	@Override
-	public String getID() {
+	public int getID() {
 		return id;
 	}
 

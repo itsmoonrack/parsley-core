@@ -1,9 +1,8 @@
 package org.spicefactory.parsley.messaging;
 
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spicefactory.parsley.core.messaging.Selector;
 import org.spicefactory.parsley.core.scope.Scope;
 import org.spicefactory.parsley.core.scope.ScopeManager;
 
@@ -35,11 +34,11 @@ class MessageDispatcher implements Dispatcher {
 
 	@Override
 	public void dispatchMessage(Object message) {
-		dispatchMessage(message, null);
+		dispatchMessage(message, Selector.NONE);
 	}
 
 	@Override
-	public void dispatchMessage(Object message, @Nullable String selector) {
+	public void dispatchMessage(Object message, int selector) {
 		if (!enabled) {
 			logger.warn("Attempt to use message dispatcher for {} after it has been disabled.", owner);
 			return;

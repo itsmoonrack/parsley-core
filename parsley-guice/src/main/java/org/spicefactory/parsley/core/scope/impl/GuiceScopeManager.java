@@ -19,6 +19,7 @@ import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.MessageRouter;
+import org.spicefactory.parsley.core.messaging.Selector;
 import org.spicefactory.parsley.core.messaging.impl.DefaultMessage;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
 import org.spicefactory.parsley.core.scope.Scope;
@@ -112,7 +113,7 @@ public class GuiceScopeManager implements ScopeManager {
 	}
 
 	@Override
-	public void dispatchMessage(Object instance, String selector) {
+	public void dispatchMessage(Object instance, int selector) {
 		final Class<?> type = instance.getClass();
 		final List<ScopeInfo> scopes = scopeInfoRegistry.getActiveScopes();
 		final List<MessageReceiverCache> caches = new ArrayList<MessageReceiverCache>(scopes.size());
@@ -122,7 +123,7 @@ public class GuiceScopeManager implements ScopeManager {
 		}
 		final MessageReceiverCache cache = new MergedMessageReceiverCache(caches);
 
-		if (selector == null) {
+		if (selector == Selector.NONE) {
 			selector = cache.getSelectorValue(instance);
 		}
 		final Message message = new DefaultMessage(instance, type, selector);
@@ -196,7 +197,7 @@ public class GuiceScopeManager implements ScopeManager {
 		}
 
 		@Override
-		public List<MessageReceiver> getReceivers(MessageReceiverKind kind, String selector) {
+		public List<MessageReceiver> getReceivers(MessageReceiverKind kind, int selector) {
 			List<MessageReceiver> receivers = new ArrayList<MessageReceiver>();
 			for (MessageReceiverCache cache : caches) {
 				receivers.addAll(cache.getReceivers(kind, selector));
@@ -205,9 +206,8 @@ public class GuiceScopeManager implements ScopeManager {
 		}
 
 		@Override
-		public String getSelectorValue(Object message) {
-			// TODO Auto-generated method stub
-			return null;
+		public int getSelectorValue(Object message) {
+			return (caches.size() > 0) ? caches.get(0).getSelectorValue(message) : Selector.NONE;
 		}
 
 	}

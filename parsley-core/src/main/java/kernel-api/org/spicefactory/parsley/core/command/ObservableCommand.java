@@ -24,7 +24,7 @@ public interface ObservableCommand {
 	/**
 	 * The id the command is registered with in the Context.
 	 */
-	String id();
+	int id();
 
 	/**
 	 * The type of the command.

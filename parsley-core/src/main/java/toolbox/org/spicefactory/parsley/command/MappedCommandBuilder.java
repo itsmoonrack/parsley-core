@@ -69,7 +69,7 @@ public final class MappedCommandBuilder implements ContextListener {
 	 * @param selector the selector to use for matching messages.
 	 * @return this builder instance for method chaining
 	 */
-	public MappedCommandBuilder selector(Object selector) {
+	public MappedCommandBuilder selector(int selector) {
 		info.selector = selector;
 		return this;
 	}
