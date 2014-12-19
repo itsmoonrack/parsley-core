@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.spicefactory.parsley.command.MappedCommandBuilder;
+import org.spicefactory.parsley.command.annotation.MapCommand;
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.impl.DefaultCommandManager;
 import org.spicefactory.parsley.core.context.Context;
@@ -28,7 +29,7 @@ import com.google.inject.Provides;
 @ViewSettings
 @MessageSettings
 @ScopeDefinition(name = Scope.GLOBAL_)
-public class GuiceParsleyConfig extends AbstractModule {
+public final class GuiceParsleyConfig extends AbstractModule {
 
 	private final GuiceParsleyTypeListener listener = new GuiceParsleyTypeListener();
 
@@ -65,8 +66,28 @@ public class GuiceParsleyConfig extends AbstractModule {
 		return parentScopes;
 	}
 
+	private static final List<MappedCommandBuilder> mappedCommands = new LinkedList<MappedCommandBuilder>();
+
 	@Provides
 	protected List<MappedCommandBuilder> getMappedCommands() {
-		return listener.mappedCommands;
+		return mappedCommands;
+	}
+
+	/**
+	 * Binds a command to the framework, using just-in-time binding.
+	 * <p>
+	 * A command needs to be annotated by @MapCommand
+	 * @param c
+	 */
+	public static void bindCommand(Class<?> c) {
+		MapCommand mapCommand = c.getAnnotation(MapCommand.class);
+		if (mapCommand == null) {
+			throw new RuntimeException("Cannot map command '" + c.getSimpleName() + "'. @MapCommand annotation is missing.");
+		}
+		mappedCommands.add(MappedCommandBuilder.forType(c). //
+				messageType(mapCommand.messageType()). //
+				selector(mapCommand.selector()). //
+				order(mapCommand.order()). //
+				scope(mapCommand.scope()));
 	}
 }

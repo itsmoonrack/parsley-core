@@ -13,5 +13,5 @@
 			<artifactId>parsley-core</artifactId>
 		</dependency>
 	</dependencies>
-	<name>Parsley Swing</name>
+	<name>Parsley Swing Integration</name>
 </project>

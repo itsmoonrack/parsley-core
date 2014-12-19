@@ -50,15 +50,24 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 		this.context = context;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * The target command that this proxy should execute.
 	 * <p>
 	 * The <code>type</code> and <code>target</code> properties are mutually exclusive.
 	 * </p>
 	 */
-	void setTarget(Command target) {
-		this.target = target;
+	public void setTarget(Command value) {
+		this.target = value;
 		this.type = null;
+	}
+
+	@Override
+	public Command getTarget() {
+		return target;
 	}
 
 	/**
@@ -67,18 +76,9 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 	 * The <code>type</code> and <code>target</code> properties are mutually exclusive.
 	 * </p>
 	 */
-	void setType(Class<?> type) {
-		this.type = type;
+	public void setType(Class<?> value) {
+		this.type = value;
 		this.target = null;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////
-	// Public API.
-	/////////////////////////////////////////////////////////////////////////////
-
-	@Override
-	public Command getTarget() {
-		return target;
 	}
 
 	@Override
@@ -97,6 +97,9 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 
 	@Override
 	protected void doExecute() {
+		if (target == null && type == null) {
+			throw new IllegalStateException("Either target or type property must be set.");
+		}
 		if (target == null) {
 			try {
 				CommandAdapterFactory factory = context.getInstance(CommandAdapterFactory.class);
@@ -104,7 +107,7 @@ public class DefaultManagedCommandProxy extends AbstractCommandExecutor implemen
 				target = (instance instanceof Command) ? (Command) instance : factory.createAdapter(instance);
 			}
 			catch (Exception e) {
-				error(new CommandException(this, target, e));
+				exception(new CommandException(this, target, e));
 				return;
 			}
 		}

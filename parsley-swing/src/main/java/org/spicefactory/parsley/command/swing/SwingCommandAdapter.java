@@ -19,16 +19,24 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 	private final Object target;
 	private final Method executeMethod;
+	private final Method cancelMethod;
+	private final Method resultMethod;
+	private final Method errorMethod;
+	private final boolean async;
 	private final SwingCommand worker;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	public SwingCommandAdapter(Object target, Method execute) {
+	public SwingCommandAdapter(Object target, Method execute, Method cancel, Method result, Method error, boolean async) {
 		this.target = target;
 		this.executeMethod = execute;
-		this.worker = new SwingCommand();
+		this.cancelMethod = cancel;
+		this.resultMethod = result;
+		this.errorMethod = error;
+		this.async = async;
+		this.worker = async ? new SwingCommand() : null;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -62,12 +70,12 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 	@Override
 	protected void doSuspend() {
-
+		throw new IllegalAccessError("Command is not suspendable.");
 	}
 
 	@Override
 	protected void doResume() {
-
+		throw new IllegalAccessError("Command cannot be resumed.");
 	}
 
 	@Override
@@ -77,14 +85,45 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 	@Override
 	protected void doExecute() {
-		worker.execute();
+		lifecycle.beforeExecution(target, data);
+		try {
+			if (async) {
+				System.err.println("[" + Thread.currentThread().getName() + "] Executing async command: " + target);
+				worker.execute();
+			} else {
+				System.err.println("[" + Thread.currentThread().getName() + "] Executing sync command: " + target);
+				// Result can be null if invoked method return type is void.
+				Object result = executeMethod.invoke(target, getParameters());
+				handleResult(result);
+			}
+		}
+		catch (Exception e) {
+			afterCompletion(DefaultCommandResult.forException(target, e));
+			exception(e);
+		}
+	}
+
+	private Object[] getParameters() {
+		Class<?>[] parameterTypes = executeMethod.getParameterTypes();
+		Object[] parameters = new Object[parameterTypes.length];
+		for (int i = 0; i < parameterTypes.length; ++i) {
+			parameters[i] = data.getObject(parameterTypes[i]);
+		}
+		return parameters;
+	}
+
+	private void afterCompletion(CommandResult result) {
+		lifecycle.afterCompletion(target, result);
+	}
+
+	private void handleResult(Object result) {
+
 	}
 
 	private class SwingCommand extends SwingWorker<Object, Object> {
 
 		@Override
 		protected Object doInBackground() throws Exception {
-			lifecycle.beforeExecution(target, data);
 			return executeMethod.invoke(target, getParameters());
 		}
 
@@ -105,18 +144,9 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 				result = DefaultCommandResult.forException(target, e.getCause());
 			}
 			finally {
-				lifecycle.afterCompletion(target, result);
+				afterCompletion(result);
 				// TODO: Use this result.
 			}
-		}
-
-		private Object[] getParameters() {
-			Class<?>[] parameterTypes = executeMethod.getParameterTypes();
-			Object[] parameters = new Object[parameterTypes.length];
-			for (int i = 0; i < parameterTypes.length; ++i) {
-				parameters[i] = data.getObject(parameterTypes[i]);
-			}
-			return parameters;
 		}
 
 	}
