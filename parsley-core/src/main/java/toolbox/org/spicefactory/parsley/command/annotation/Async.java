@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * A command is seen as asynchronous by the framework when it is annotated by @Async tag.
  * <p>
- * When a command is asynchronous, the execute function is generally called in a background thread, depending on the implementation.
+ * When a command is asynchronous, the execute method is generally called in a background thread, depending on the implementation.
  * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
  */
 @Documented

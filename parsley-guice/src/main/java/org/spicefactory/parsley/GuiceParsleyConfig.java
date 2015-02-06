@@ -79,15 +79,17 @@ public final class GuiceParsleyConfig extends AbstractModule {
 	 * A command needs to be annotated by @MapCommand
 	 * @param c
 	 */
-	public static void bindCommand(Class<?> c) {
+	public static MappedCommandBuilder bindCommand(Class<?> c) {
 		MapCommand mapCommand = c.getAnnotation(MapCommand.class);
 		if (mapCommand == null) {
 			throw new RuntimeException("Cannot map command '" + c.getSimpleName() + "'. @MapCommand annotation is missing.");
 		}
-		mappedCommands.add(MappedCommandBuilder.forType(c). //
+		MappedCommandBuilder builder = MappedCommandBuilder.forType(c). //
 				messageType(mapCommand.messageType()). //
 				selector(mapCommand.selector()). //
 				order(mapCommand.order()). //
-				scope(mapCommand.scope()));
+				scope(mapCommand.scope());
+		mappedCommands.add(builder);
+		return builder;
 	}
 }

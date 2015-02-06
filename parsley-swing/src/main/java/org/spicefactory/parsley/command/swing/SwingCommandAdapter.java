@@ -88,10 +88,8 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 		lifecycle.beforeExecution(target, data);
 		try {
 			if (async) {
-				System.err.println("[" + Thread.currentThread().getName() + "] Executing async command: " + target);
 				worker.execute();
 			} else {
-				System.err.println("[" + Thread.currentThread().getName() + "] Executing sync command: " + target);
 				// Result can be null if invoked method return type is void.
 				Object result = executeMethod.invoke(target, getParameters());
 				handleResult(result);
