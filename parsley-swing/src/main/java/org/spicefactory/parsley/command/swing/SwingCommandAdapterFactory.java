@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import org.spicefactory.lib.command.adapter.CommandAdapter;
 import org.spicefactory.lib.command.adapter.CommandAdapterFactory;
-import org.spicefactory.parsley.command.annotation.Async;
+import org.spicefactory.parsley.command.annotation.MapCommand;
 
 /**
  * A CommandAdapterFactory implementation that creates adapters from commands that adhere to the conventions of Spicelib's "Swing Commands".
@@ -18,7 +18,8 @@ public class SwingCommandAdapterFactory implements CommandAdapterFactory {
 		Method cancel = null;
 		Method result = null;
 		Method error = null;
-		boolean async = instance.getClass().isAnnotationPresent(Async.class);
+		// Command is assumed to be annotated.
+		boolean async = instance.getClass().getAnnotation(MapCommand.class).async();
 
 		for (Method m : instance.getClass().getMethods()) {
 			if ("execute".equals(m.getName())) {

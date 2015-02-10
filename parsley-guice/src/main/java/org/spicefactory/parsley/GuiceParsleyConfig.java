@@ -3,7 +3,11 @@ package org.spicefactory.parsley;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Provider;
+
+import org.spicefactory.lib.command.builder.CommandBuilder;
 import org.spicefactory.parsley.command.MappedCommandBuilder;
+import org.spicefactory.parsley.command.MappedCommands;
 import org.spicefactory.parsley.command.annotation.MapCommand;
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.impl.DefaultCommandManager;
@@ -77,19 +81,54 @@ public final class GuiceParsleyConfig extends AbstractModule {
 	 * Binds a command to the framework, using just-in-time binding.
 	 * <p>
 	 * A command needs to be annotated by @MapCommand
-	 * @param c
+	 * @param command
 	 */
-	public static MappedCommandBuilder bindCommand(Class<?> c) {
-		MapCommand mapCommand = c.getAnnotation(MapCommand.class);
+	public static void bindCommand(Class<?> command) {
+		MapCommand mapCommand = command.getAnnotation(MapCommand.class);
 		if (mapCommand == null) {
-			throw new RuntimeException("Cannot map command '" + c.getSimpleName() + "'. @MapCommand annotation is missing.");
+			throw new RuntimeException("Cannot map command '" + command.getSimpleName() + "'. @MapCommand annotation is missing.");
 		}
-		MappedCommandBuilder builder = MappedCommandBuilder.forType(c). //
+		MappedCommandBuilder builder = MappedCommands.create(command). //
 				messageType(mapCommand.messageType()). //
+				selector(mapCommand.selector()). //
+				order(mapCommand.order()). //
+				scope(mapCommand.scope());
+		mappedCommands.add(builder);
+	}
+
+	/**
+	 * Binds a command factory to a message, using just-in-time binding.
+	 */
+	public static MappedCommandBuilder bindCommand(Class<?> messageType, CommandBuilder target) {
+		MapCommand mapCommand = DefaultCommand.class.getAnnotation(MapCommand.class);
+		MappedCommandBuilder builder = MappedCommands. //
+				// No need to specify type of command (messageType is given).
+				provide(new CommandBuilderProvider(target), null). //
+				messageType(messageType). //
 				selector(mapCommand.selector()). //
 				order(mapCommand.order()). //
 				scope(mapCommand.scope());
 		mappedCommands.add(builder);
 		return builder;
 	}
+
+	private static class CommandBuilderProvider implements Provider<CommandBuilder> {
+
+		private final CommandBuilder target;
+
+		public CommandBuilderProvider(CommandBuilder target) {
+			this.target = target;
+		}
+
+		@Override
+		public CommandBuilder get() {
+			return target;
+		}
+
+	}
+
+	@MapCommand
+	private static class DefaultCommand {
+	}
+
 }

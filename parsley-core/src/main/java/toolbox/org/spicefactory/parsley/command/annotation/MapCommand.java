@@ -45,6 +45,11 @@ public @interface MapCommand {
 	int selector() default Selector.NONE;
 
 	/**
+	 * When a command is asynchronous, the execute method is generally called in a background thread, depending on the implementation.
+	 */
+	boolean async() default false;
+
+	/**
 	 * The execution order in relation to other message receivers.
 	 * <p>
 	 * This order attribute affects all types of message receivers, not only those that execute commands.

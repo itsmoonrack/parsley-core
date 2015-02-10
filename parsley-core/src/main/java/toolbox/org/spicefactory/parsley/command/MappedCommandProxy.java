@@ -13,7 +13,7 @@ import org.spicefactory.parsley.messaging.receiver.MessageReceiverInfo;
  * Parsley message target that executes a command when a message is received.
  * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
  */
-class MappedCommandProxy extends AbstractMessageReceiver implements MessageTarget {
+public class MappedCommandProxy extends AbstractMessageReceiver implements MessageTarget {
 
 	private final Context context;
 	private final ManagedCommandFactory factory;
@@ -26,7 +26,7 @@ class MappedCommandProxy extends AbstractMessageReceiver implements MessageTarge
 	 * @param selector the optional selector to match messages
 	 * @param order the execution order for this receiver compared to other handlers for the same message
 	 */
-	MappedCommandProxy(ManagedCommandFactory factory, Context context, MessageReceiverInfo info) {
+	public MappedCommandProxy(ManagedCommandFactory factory, Context context, MessageReceiverInfo info) {
 		super(info);
 
 		this.context = context;
@@ -43,7 +43,7 @@ class MappedCommandProxy extends AbstractMessageReceiver implements MessageTarge
 
 	@Override
 	public void handleMessage(MessageProcessor processor) {
-		ManagedCommandProxy command = factory.newInstance(); // TODO: Check this can use context.getInstance().
+		ManagedCommandProxy command = factory.newInstance();
 		DefaultCommandData data = new DefaultCommandData();
 		data.addValue(processor.getMessage().getInstance());
 		command.prepare(new ManagedCommandLifecycle(context, command, processor.getMessage()), data);

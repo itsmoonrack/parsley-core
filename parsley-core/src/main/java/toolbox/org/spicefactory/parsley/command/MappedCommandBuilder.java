@@ -2,6 +2,8 @@ package org.spicefactory.parsley.command;
 
 import java.lang.reflect.Method;
 
+import javax.inject.Provider;
+
 import org.spicefactory.lib.command.Command;
 import org.spicefactory.lib.command.builder.CommandBuilder;
 import org.spicefactory.lib.command.builder.Commands;
@@ -17,12 +19,12 @@ import org.spicefactory.parsley.messaging.receiver.MessageReceiverInfo;
 /**
  * A builder DSL for mapping commands to messages.
  * <p>
- * This API adds on top of the standalone Spicelib Commands builder APIs the ability to let commands get managed by a Parsley Context during
+ * This API adds on top of the stand-alone Spicelib Commands builder APIs the ability to let commands get managed by a Parsley Context during
  * execution and to trigger execution based on a message.
  * </p>
  * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
  */
-public final class MappedCommandBuilder implements ContextListener {
+public class MappedCommandBuilder implements ContextListener {
 
 	private final ManagedCommandFactory factory;
 	private final MessageReceiverInfo info = new MessageReceiverInfo();
@@ -42,11 +44,15 @@ public final class MappedCommandBuilder implements ContextListener {
 	/** The default command trigger provider (Can be overridden by extension frameworks). */
 	static CommandTriggerProvider commandTriggerProvider = new DefaultCommandTriggerProvider();
 
-	public static MappedCommandBuilder forFactory(ManagedCommandFactory factory) {
+	static MappedCommandBuilder forFactory(ManagedCommandFactory factory) {
 		return new MappedCommandBuilder(factory);
 	}
 
-	public static MappedCommandBuilder forType(Class<?> type) {
+	static MappedCommandBuilder forType(Class<?> type) {
+		return new MappedCommandBuilder(new Factory(type));
+	}
+
+	static MappedCommandBuilder forProvider(Provider<?> provider, Class<?> type) {
 		return new MappedCommandBuilder(new Factory(type));
 	}
 
@@ -127,6 +133,7 @@ public final class MappedCommandBuilder implements ContextListener {
 	private static class Factory implements ManagedCommandFactory {
 
 		private Context context;
+		private Provider<?> provider;
 		private final Class<?> type;
 
 		/////////////////////////////////////////////////////////////////////////////
@@ -141,6 +148,11 @@ public final class MappedCommandBuilder implements ContextListener {
 			this.type = type;
 		}
 
+		public Factory(Class<?> type, Provider<?> provider) {
+			this.type = type;
+			this.provider = provider;
+		}
+
 		public void init(Context context) {
 			this.context = context;
 		}
@@ -152,6 +164,7 @@ public final class MappedCommandBuilder implements ContextListener {
 
 		@Override
 		public ManagedCommandProxy newInstance() {
+			Object target = provider == null ? type : provider.get();
 			DefaultManagedCommandProxy proxy = new DefaultManagedCommandProxy(context);
 			CommandProxyBuilder builder = new CommandProxyBuilder(type, proxy);
 			builder.build();
@@ -221,7 +234,6 @@ public final class MappedCommandBuilder implements ContextListener {
 			if (target instanceof Class<?>) {
 				proxy.setType((Class<?>) target);
 			} else {
-				// TODO: This is not supported yet.
 				proxy.setTarget(asCommand(target));
 			}
 
