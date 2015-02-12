@@ -3,12 +3,9 @@ package org.spicefactory.parsley;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import org.spicefactory.lib.command.builder.CommandBuilder;
+import org.spicefactory.parsley.command.GuiceCommandBinder;
 import org.spicefactory.parsley.command.MappedCommandBuilder;
-import org.spicefactory.parsley.command.MappedCommands;
-import org.spicefactory.parsley.command.annotation.MapCommand;
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.impl.DefaultCommandManager;
 import org.spicefactory.parsley.core.context.Context;
@@ -28,11 +25,12 @@ import org.spicefactory.parsley.core.view.ViewSettings;
 import org.spicefactory.parsley.view.FastInject;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
 import com.google.inject.Provides;
 
 @ViewSettings
 @MessageSettings
-@ScopeDefinition(name = Scope.GLOBAL_)
+@ScopeDefinition(name = Scope.GLOBAL)
 public final class GuiceParsleyConfig extends AbstractModule {
 
 	private final GuiceParsleyTypeListener listener = new GuiceParsleyTypeListener();
@@ -66,7 +64,7 @@ public final class GuiceParsleyConfig extends AbstractModule {
 		// TODO: Scopes are hard-coded here. Should create a scope per Module, Scope.LOCAL,
 		// and possibility to add more. Also check the inherited property.
 		List<ScopeInfo> parentScopes = new LinkedList<ScopeInfo>();
-		parentScopes.add(new GuiceScopeInfo(Scope.GLOBAL, commandManager));
+		parentScopes.add(new GuiceScopeInfo(Scope.GLOBAL_SCOPE, commandManager));
 		return parentScopes;
 	}
 
@@ -84,51 +82,15 @@ public final class GuiceParsleyConfig extends AbstractModule {
 	 * @param command
 	 */
 	public static void bindCommand(Class<?> command) {
-		MapCommand mapCommand = command.getAnnotation(MapCommand.class);
-		if (mapCommand == null) {
-			throw new RuntimeException("Cannot map command '" + command.getSimpleName() + "'. @MapCommand annotation is missing.");
-		}
-		MappedCommandBuilder builder = MappedCommands.create(command). //
-				messageType(mapCommand.messageType()). //
-				selector(mapCommand.selector()). //
-				order(mapCommand.order()). //
-				scope(mapCommand.scope());
-		mappedCommands.add(builder);
+		mappedCommands.add(GuiceCommandBinder.mapCommand(command));
 	}
 
 	/**
 	 * Binds a command factory to a message, using just-in-time binding.
 	 */
-	public static MappedCommandBuilder bindCommand(Class<?> messageType, CommandBuilder target) {
-		MapCommand mapCommand = DefaultCommand.class.getAnnotation(MapCommand.class);
-		MappedCommandBuilder builder = MappedCommands. //
-				// No need to specify type of command (messageType is given).
-				provide(new CommandBuilderProvider(target), null). //
-				messageType(messageType). //
-				selector(mapCommand.selector()). //
-				order(mapCommand.order()). //
-				scope(mapCommand.scope());
+	public static MappedCommandBuilder bindCommand(Class<?> messageType, CommandBuilder target, Binder binder) {
+		MappedCommandBuilder builder = GuiceCommandBinder.mapCommand(messageType, target, binder.getProvider(Context.class));
 		mappedCommands.add(builder);
 		return builder;
 	}
-
-	private static class CommandBuilderProvider implements Provider<CommandBuilder> {
-
-		private final CommandBuilder target;
-
-		public CommandBuilderProvider(CommandBuilder target) {
-			this.target = target;
-		}
-
-		@Override
-		public CommandBuilder get() {
-			return target;
-		}
-
-	}
-
-	@MapCommand
-	private static class DefaultCommand {
-	}
-
 }

@@ -1,9 +1,8 @@
-package org.spicefactory.parsley.command;
+package org.spicefactory.parsley.command.impl;
 
 import javax.annotation.Nullable;
 
 import org.spicefactory.lib.command.Command;
-import org.spicefactory.lib.command.adapter.CommandAdapterFactory;
 import org.spicefactory.lib.command.lifecycle.CommandLifecycle;
 import org.spicefactory.lib.command.proxy.DefaultCommandProxy;
 import org.spicefactory.parsley.core.command.ManagedCommandProxy;
@@ -15,11 +14,7 @@ public class DefaultManagedCommandProxy extends DefaultCommandProxy implements M
 	private Context context;
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Package-private.
-	/////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////
-	// Public API.
+	// Component exposed API.
 	/////////////////////////////////////////////////////////////////////////////
 
 	/**
@@ -54,22 +49,25 @@ public class DefaultManagedCommandProxy extends DefaultCommandProxy implements M
 	 */
 	public DefaultManagedCommandProxy(@Nullable Context context, @Nullable Command command, int id) {
 		this.id = id;
-		this.context = context;
 		setTarget(command);
+		setContext(context);
 	}
 
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	public void setContext(Context context) {
+		this.context = context;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
+
 	@Override
 	public int getID() {
 		return id;
-	}
-
-	public void setContext(Context context) {
-		this.context = context;
-		this.factory = context.getInstance(CommandAdapterFactory.class);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////

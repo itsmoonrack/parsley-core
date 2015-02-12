@@ -5,6 +5,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.spicefactory.lib.command.adapter.CommandAdapterFactory;
+import org.spicefactory.lib.command.adapter.CommandAdapters;
 import org.spicefactory.lib.event.AbstractEventDispatcher;
 import org.spicefactory.parsley.command.MappedCommandBuilder;
 import org.spicefactory.parsley.core.context.Context;
@@ -27,6 +29,15 @@ public class GuiceContext extends AbstractEventDispatcher<ContextListener, Conte
 
 	@Inject
 	ScopeManager scopeManager;
+
+	@Inject
+	void mapCommandFactory(CommandAdapterFactory factory) {
+		// Adds this factory to the registry of command adapters.
+		// We consider that it is configuration code hence it is
+		// acceptable to make use of static keyword in this case
+		// so it remains in the JVM between application restarts.
+		CommandAdapters.addFactory(factory);
+	}
 
 	@Inject
 	void mapCommands(List<MappedCommandBuilder> mappedCommands) {

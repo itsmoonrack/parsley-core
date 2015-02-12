@@ -37,6 +37,20 @@ import org.spicefactory.parsley.core.context.Context;
  */
 public final class ContextBuilder {
 
+	private final BootstrapProcessor processor;
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Package-private.
+	/////////////////////////////////////////////////////////////////////////////
+
+	ContextBuilder(BootstrapProcessor processor) {
+		this.processor = processor;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Creates a new setup instance that allows to specify custom options for the ContextBuilder to be created.
 	 * @return a new setup instance that allows to specify custom options for the ContextBuilder to be created
@@ -84,9 +98,7 @@ public final class ContextBuilder {
 		return context;
 	}
 
-	private final BootstrapProcessor processor;
-
-	ContextBuilder(BootstrapProcessor processor) {
-		this.processor = processor;
-	}
+	/////////////////////////////////////////////////////////////////////////////
+	// Internal implementation.
+	/////////////////////////////////////////////////////////////////////////////
 }

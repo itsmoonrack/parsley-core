@@ -2,6 +2,7 @@ package org.spicefactory.parsley.core.scope;
 
 import java.lang.annotation.Annotation;
 
+import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.messaging.MessageReceiverRegistry;
 
 /**
@@ -17,7 +18,7 @@ public interface Scope {
 	 * global application-wide, since you can build disconnected Context hierarchies, although this is a rather rare use case.
 	 * </p>
 	 */
-	final static String GLOBAL_ = "global";
+	final static String GLOBAL = "global";
 
 	/**
 	 * Constant for the global scope.
@@ -26,7 +27,7 @@ public interface Scope {
 	 * global application-wide, since you can build disconnected Context hierarchies, although this is a rather rare use case.
 	 * </p>
 	 */
-	final static ScopeDefinition GLOBAL = new GlobalScope();
+	final static ScopeDefinition GLOBAL_SCOPE = new GlobalScope();
 
 	/**
 	 * Constant for the name of the local scope.
@@ -69,10 +70,11 @@ public interface Scope {
 	 */
 	MessageReceiverRegistry getMessageReceivers();
 
-	//	/**
-	//	 * The manager for active asynchronous commands in this scope.
-	//	 */
-	//	function get commandManager () : CommandManager;
+	/**
+	 * The manager for active asynchronous commands in this scope.
+	 */
+	CommandManager getCommandManager();
+
 	//
 	//	/**
 	//	 * The manager for publishers and subscribers of the decoupled binding facility.
@@ -105,7 +107,7 @@ public interface Scope {
 
 		@Override
 		public String name() {
-			return Scope.GLOBAL_;
+			return Scope.GLOBAL;
 		}
 
 		@Override

@@ -73,7 +73,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 	@Override
 	public String toString() {
-		return target.toString();
+		return getClass().getSimpleName() + "[" + target + "]";
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -104,6 +104,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 			} else {
 				// Result can be null if invoked method return type is void.
 				Object result = executeMethod.invoke(target, getParameters());
+				System.err.println("invoke(target) > " + result);
 				handleResult(result);
 			}
 		}
@@ -211,10 +212,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 				logger.debug("An exception has been raised in command.", e.getCause());
 				result = DefaultCommandResult.forException(target, e.getCause());
 			}
-			finally {
-				afterCompletion(result);
-				// TODO: Use this result.
-			}
+			handleResult(result);
 		}
 
 	}
@@ -227,6 +225,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 		@Override
 		public void process(CommandEvent event) {
+			System.err.println("CommandCompletionCallback");
 		}
 
 	}
@@ -235,6 +234,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 		@Override
 		public void process(CommandEvent event) {
+			System.err.println("CommandExceptionCallback");
 		}
 	}
 
@@ -242,6 +242,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 
 		@Override
 		public void process(CommandEvent event) {
+			System.err.println("CommandCancellationCallback");
 		}
 	}
 

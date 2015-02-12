@@ -8,6 +8,9 @@ import org.spicefactory.lib.command.Command;
 import org.spicefactory.lib.command.builder.CommandBuilder;
 import org.spicefactory.lib.command.builder.Commands;
 import org.spicefactory.lib.command.proxy.CommandProxy;
+import org.spicefactory.parsley.command.impl.CommandTriggerProvider;
+import org.spicefactory.parsley.command.impl.DefaultManagedCommandProxy;
+import org.spicefactory.parsley.command.impl.MappedCommandProxy;
 import org.spicefactory.parsley.core.command.ManagedCommandFactory;
 import org.spicefactory.parsley.core.command.ManagedCommandProxy;
 import org.spicefactory.parsley.core.context.Context;
@@ -53,7 +56,7 @@ public class MappedCommandBuilder implements ContextListener {
 	}
 
 	static MappedCommandBuilder forProvider(Provider<?> provider, Class<?> type) {
-		return new MappedCommandBuilder(new Factory(type));
+		return new MappedCommandBuilder(new Factory(type, provider));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -166,7 +169,7 @@ public class MappedCommandBuilder implements ContextListener {
 		public ManagedCommandProxy newInstance() {
 			Object target = provider == null ? type : provider.get();
 			DefaultManagedCommandProxy proxy = new DefaultManagedCommandProxy(context);
-			CommandProxyBuilder builder = new CommandProxyBuilder(type, proxy);
+			CommandProxyBuilder builder = new CommandProxyBuilder(target, proxy);
 			builder.build();
 			return proxy;
 		}
@@ -236,7 +239,6 @@ public class MappedCommandBuilder implements ContextListener {
 			} else {
 				proxy.setTarget(asCommand(target));
 			}
-
 			return proxy;
 		}
 

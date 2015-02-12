@@ -3,6 +3,7 @@ package org.spicefactory.parsley.command;
 import org.spicefactory.lib.command.builder.CommandProxyBuilder;
 import org.spicefactory.lib.command.events.CommandEvent;
 import org.spicefactory.lib.event.EventListener;
+import org.spicefactory.parsley.command.impl.DefaultManagedCommandProxy;
 import org.spicefactory.parsley.core.command.ManagedCommandProxy;
 import org.spicefactory.parsley.core.context.Context;
 
@@ -114,6 +115,7 @@ public class ManagedCommandBuilder {
 	 * @return the command proxy will all configuration of this builder applied
 	 */
 	public ManagedCommandProxy build(Context context) {
+		System.err.println("ManagedCommandProxy.build(" + context + ")");
 		proxy.setId(id);
 		proxy.setContext(context);
 		builder.build();

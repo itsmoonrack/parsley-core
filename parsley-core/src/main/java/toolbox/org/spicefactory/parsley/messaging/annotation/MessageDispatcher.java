@@ -25,6 +25,6 @@ public @interface MessageDispatcher {
 	 * <p>
 	 * If this attribute is omitted the message will be dispatched through all scopes of the corresponding Context.
 	 */
-	String scope() default Scope.GLOBAL_;
+	String scope() default Scope.GLOBAL;
 
 }

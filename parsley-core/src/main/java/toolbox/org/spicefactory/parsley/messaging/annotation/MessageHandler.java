@@ -52,7 +52,7 @@ public @interface MessageHandler {
 	/**
 	 * The name of the scope this tag should be applied to.
 	 */
-	String scope() default Scope.GLOBAL_;
+	String scope() default Scope.GLOBAL;
 
 	/**
 	 * The type of the messages the receiver wants to handle.

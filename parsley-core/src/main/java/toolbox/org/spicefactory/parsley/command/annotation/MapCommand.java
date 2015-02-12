@@ -32,7 +32,7 @@ public @interface MapCommand {
 	/**
 	 * The name of the scope in which to listen for messages.
 	 */
-	String scope() default Scope.GLOBAL_;
+	String scope() default Scope.GLOBAL;
 
 	/**
 	 * The type of message (including sub-types) that should trigger command execution.

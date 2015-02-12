@@ -2,6 +2,7 @@ package org.spicefactory.parsley.core.scope.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
@@ -64,5 +65,10 @@ public class DefaultScope implements Scope {
 		}
 
 		messageRouter.dispatchMessage(message, cache);
+	}
+
+	@Override
+	public CommandManager getCommandManager() {
+		return info.commandManager();
 	}
 }

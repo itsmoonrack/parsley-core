@@ -129,7 +129,7 @@ public class GuiceScopeManager implements ScopeManager {
 		final Message message = new DefaultMessage(instance, type, selector);
 
 		if (cache.getReceivers(MessageReceiverKind.TARGET, selector).size() == 0) {
-			logger.warn("Discarding message '{}': no matching receiver in any scope.", type);
+			logger.warn("Discarding message '{}': no matching receiver in any scope.", type.getName());
 			return;
 		}
 
@@ -170,7 +170,7 @@ public class GuiceScopeManager implements ScopeManager {
 			if (!hasReceivers(command)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Discarding command status {} for message '{}': no matching observer.", command.status(),
-							(command.trigger() == null ? "no trigger" : command.trigger().getInstance()));
+							(command.trigger() == null ? "no trigger" : command.trigger().getInstance().getClass()));
 				}
 				return;
 			}

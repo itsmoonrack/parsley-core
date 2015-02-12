@@ -1,4 +1,4 @@
-package org.spicefactory.parsley.command;
+package org.spicefactory.parsley.command.impl;
 
 /**
  * Strategy that allows to determine the trigger message type for a command based on the type of the command.

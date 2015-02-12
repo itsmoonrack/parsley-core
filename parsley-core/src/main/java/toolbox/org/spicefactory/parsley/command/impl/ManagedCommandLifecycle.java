@@ -1,4 +1,4 @@
-package org.spicefactory.parsley.command;
+package org.spicefactory.parsley.command.impl;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,7 +17,7 @@ import org.spicefactory.parsley.core.command.ObservableCommand;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.messaging.Message;
 
-class ManagedCommandLifecycle implements CommandLifecycle {
+public class ManagedCommandLifecycle implements CommandLifecycle {
 
 	private final Context context;
 	private final Message trigger;
@@ -27,14 +27,14 @@ class ManagedCommandLifecycle implements CommandLifecycle {
 	private int nextId;
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Package-private.
+	// Component exposed API.
 	/////////////////////////////////////////////////////////////////////////////
 
-	ManagedCommandLifecycle(Context context, ManagedCommandProxy root) {
+	public ManagedCommandLifecycle(Context context, ManagedCommandProxy root) {
 		this(context, root, null);
 	}
 
-	ManagedCommandLifecycle(Context context, ManagedCommandProxy root, @Nullable Message trigger) {
+	public ManagedCommandLifecycle(Context context, ManagedCommandProxy root, @Nullable Message trigger) {
 		this.context = context;
 		this.trigger = trigger;
 		this.nextId = root.getID();
@@ -129,7 +129,8 @@ class ManagedCommandLifecycle implements CommandLifecycle {
 		}
 
 		public void setResult(CommandResult result) {
-			this.status = (result.complete() ? CommandStatus.COMPLETE : (result.getValue() == null ? CommandStatus.CANCEL : CommandStatus.ERROR));
+			this.status =
+					(result.complete() ? CommandStatus.COMPLETE : (result.getValue() == null ? CommandStatus.CANCEL : CommandStatus.ERROR));
 			this.result = result.getValue();
 			for (CommandObserver callback : callbacks) {
 				callback.update(this);

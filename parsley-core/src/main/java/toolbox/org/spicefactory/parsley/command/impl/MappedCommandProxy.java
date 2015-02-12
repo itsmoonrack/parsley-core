@@ -1,4 +1,4 @@
-package org.spicefactory.parsley.command;
+package org.spicefactory.parsley.command.impl;
 
 import org.spicefactory.lib.command.data.DefaultCommandData;
 import org.spicefactory.parsley.core.command.ManagedCommandFactory;
@@ -18,6 +18,10 @@ public class MappedCommandProxy extends AbstractMessageReceiver implements Messa
 	private final Context context;
 	private final ManagedCommandFactory factory;
 
+	/////////////////////////////////////////////////////////////////////////////
+	// Component exposed API.
+	/////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Creates a new instance.
 	 * @param factory the factory to use for creating new commands
@@ -32,10 +36,6 @@ public class MappedCommandProxy extends AbstractMessageReceiver implements Messa
 		this.context = context;
 		this.factory = factory;
 	}
-
-	/////////////////////////////////////////////////////////////////////////////
-	// Package-private.
-	/////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Public API.
