@@ -13,9 +13,13 @@ import org.spicefactory.parsley.core.scope.Scope;
 /**
  * This annotation can be used to obtains the result produced by a commend in a different object. (It is not needed and should not be used to
  * define a result handler inside the command itself).
- * <p>
- * <code>@CommandResult protected void handleResult(User user, LoginMessage trigger);</code>
- * <p>
+ *
+ * <pre>
+ * <code>
+ * @CommandResult
+ * public void handleResult(User user, LoginMessage trigger);</code>
+ * </pre>
+ *
  * In this case the User instance returned by the remote call will be passed to the result handler alongside the original message that triggered
  * the action. Like with normal message handlers the parameter type for the message is used to determine which handlers to invoke. It is always a
  * combination of message type (polymorphically) and an optional selector value which serves as a secondary selection key. The type of the result
@@ -27,7 +31,12 @@ import org.spicefactory.parsley.core.scope.Scope;
  * <p>
  * In case you do need to process the result as early as possible, you can use the immediate attribute:
  * <p>
- * <code>@CommandResult(immediate = true) protected void handleResult(User user, LoginMessage trigger);</code>
+ *
+ * <pre>
+ * <code>
+ * @CommandResult(immediate = true)
+ * public void handleResult(User user, LoginMessage trigger);</code>
+ * </pre>
  * <p>
  * This attribute does not have any effect if the command is not part of a sequence or flow.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>

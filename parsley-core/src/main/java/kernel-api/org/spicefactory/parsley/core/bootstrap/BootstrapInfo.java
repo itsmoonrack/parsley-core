@@ -30,7 +30,7 @@ public interface BootstrapInfo {
 	/**
 	 * The Context under construction.
 	 */
-	Context context();
+	Context getContext();
 
 	/**
 	 * The service that implements the messaging system.
