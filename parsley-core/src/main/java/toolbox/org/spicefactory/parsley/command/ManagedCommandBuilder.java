@@ -115,7 +115,6 @@ public class ManagedCommandBuilder {
 	 * @return the command proxy will all configuration of this builder applied
 	 */
 	public ManagedCommandProxy build(Context context) {
-		System.err.println("ManagedCommandProxy.build(" + context + ")");
 		proxy.setId(id);
 		proxy.setContext(context);
 		builder.build();
