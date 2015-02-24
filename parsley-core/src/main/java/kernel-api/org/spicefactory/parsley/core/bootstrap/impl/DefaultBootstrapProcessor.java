@@ -3,8 +3,8 @@ package org.spicefactory.parsley.core.bootstrap.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spicefactory.parsley.core.bootstrap.BootstrapInfo;
 import org.spicefactory.parsley.core.bootstrap.BootstrapProcessor;
 import org.spicefactory.parsley.core.bootstrap.ConfigurationProcessor;
@@ -45,8 +45,8 @@ public class DefaultBootstrapProcessor implements BootstrapProcessor {
 	@Override
 	public Context process() {
 		info.getContext().addEventListener(ContextEvent.DESTROYED, contextDestroyed);
-		// TODO Auto-generated method stub
-		return null;
+		invokeNextProcessor();
+		return info.getContext();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -60,19 +60,32 @@ public class DefaultBootstrapProcessor implements BootstrapProcessor {
 				handleError();
 			}
 		} else {
+			ConfigurationProcessor processor = null;
 			try {
-				ConfigurationProcessor processor = processors.remove(0);
+				processor = processors.remove(0);
 				handleProcessor(processor);
 			}
+			catch (Exception e) {
+				removeCurrentProcessor();
+				logger.error("Error processing {}: {}", processor, e);
+				errors.add(e);
+			}
+			invokeNextProcessor();
 		}
 	}
 
 	private void handleProcessor(ConfigurationProcessor processor) {
-		processor.processConfiguration(info.getContext());
+		//		processor.processConfiguration(info.getContext());
 	}
 
 	private void handleError() {
 		throw new ContextBuilderError("One or more errors in BootstrapProcessor", errors);
+	}
+
+	private void removeCurrentProcessor() {
+		if (currentProcessor == null)
+			return;
+		currentProcessor = null;
 	}
 
 	// Java 1.8 forward-compatibility.
@@ -85,8 +98,7 @@ public class DefaultBootstrapProcessor implements BootstrapProcessor {
 
 	private void contextDestroyed(ContextEvent event) {
 		info.getContext().removeEventListener(ContextEvent.DESTROYED, contextDestroyed);
-		if (currentProcessor != null)
-			currentProcessor.cancel();
+		//		if (currentProcessor != null)
+		//			currentProcessor.cancel();
 	}
-
 }

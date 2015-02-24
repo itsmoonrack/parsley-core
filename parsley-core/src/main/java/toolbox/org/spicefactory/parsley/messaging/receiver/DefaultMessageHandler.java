@@ -101,9 +101,9 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 	}
 
 	@Override
-	public int order() {
-		if (super.order() != Integer.MAX_VALUE) {
-			return super.order();
+	public int getOrder() {
+		if (super.getOrder() != Integer.MAX_VALUE) {
+			return super.getOrder();
 		}
 		return (isInterceptor) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 	}
@@ -141,7 +141,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 					if (targetMethod.getParameterTypes()[1].equals(MessageProcessor.class)) {
 						args.add(processor);
 					} else {
-						args.add(processor.getMessage().selector());
+						args.add(processor.getMessage().getSelector());
 						if (count == 3) {
 							args.add(processor);
 						}

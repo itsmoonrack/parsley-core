@@ -6,8 +6,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.spicefactory.lib.event.AbstractEventDispatcher;
 import org.spicefactory.lib.event.Event;
+import org.spicefactory.lib.event.EventDispatcher;
 import org.spicefactory.lib.event.EventListener;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.Selector;
@@ -20,7 +20,12 @@ import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
 //Package-private.
-class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListener, CollectionEvent> {
+class MessageReceiverCollection extends EventDispatcher<CollectionListener, CollectionEvent> {
+
+	private final Class<?> messageType;
+	private final Map<MessageReceiverKind, List<MessageReceiver>> byType;
+	private final Map<MessageReceiverKind, List<MessageReceiver>> byValue;
+	private final Map<MessageReceiverKind, List<MessageReceiver>> anySelector;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
@@ -28,14 +33,15 @@ class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListen
 
 	MessageReceiverCollection(Class<?> messageType) {
 		this.messageType = messageType;
-		this.anySelector = new EnumMap<MessageReceiverKind, List<MessageReceiver>>(MessageReceiverKind.class);
-		this.byValue = new EnumMap<MessageReceiverKind, List<MessageReceiver>>(MessageReceiverKind.class);
+		this.anySelector = Collections.synchronizedMap(new EnumMap<MessageReceiverKind, List<MessageReceiver>>(MessageReceiverKind.class));
+		this.byValue = Collections.synchronizedMap(new EnumMap<MessageReceiverKind, List<MessageReceiver>>(MessageReceiverKind.class));
+		this.byType = Collections.synchronizedMap(new EnumMap<MessageReceiverKind, List<MessageReceiver>>(MessageReceiverKind.class));
 	}
 
 	/**
 	 * The type of message receivers in this collection are interested in.
 	 */
-	Class<?> messageType() {
+	Class<?> getMessageType() {
 		return messageType;
 	}
 
@@ -45,7 +51,7 @@ class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListen
 	 * @param receiver the receiver to add
 	 */
 	void addReceiver(MessageReceiverKind kind, MessageReceiver receiver) {
-		Map<MessageReceiverKind, List<MessageReceiver>> messageReceiversMap = getReceiverMap(receiver.selector());
+		Map<MessageReceiverKind, List<MessageReceiver>> messageReceiversMap = getReceiverMap(receiver);
 		List<MessageReceiver> messageReceivers = messageReceiversMap.get(kind);
 		if (messageReceivers == null) {
 			messageReceivers = new ArrayList<MessageReceiver>();
@@ -61,7 +67,7 @@ class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListen
 	 * @param receiver the receiver to remove
 	 */
 	void removeReceiver(MessageReceiverKind kind, MessageReceiver receiver) {
-		Map<MessageReceiverKind, List<MessageReceiver>> messageReceiversMap = getReceiverMap(receiver.selector());
+		Map<MessageReceiverKind, List<MessageReceiver>> messageReceiversMap = getReceiverMap(receiver);
 		List<MessageReceiver> messageReceivers = messageReceiversMap.get(kind);
 		if (messageReceivers == null) {
 			return;
@@ -75,7 +81,7 @@ class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListen
 	 * @return <tt>true</tt> if this map contains no key-value mappings
 	 */
 	boolean isEmpty() {
-		return anySelector.isEmpty() && byValue.isEmpty();
+		return anySelector.isEmpty() && byValue.isEmpty() && byType.isEmpty();
 	}
 
 	/**
@@ -84,18 +90,39 @@ class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListen
 	 * @param selectorValue the value of the selector property
 	 * @return all receivers of a particular kind that match for the specified selector value
 	 */
-	List<MessageReceiver> getReceiversBySelectorValue(MessageReceiverKind kind, int selectorValue) {
-		if (selectorValue == Selector.NONE) {
+	List<MessageReceiver> getReceiversBySelectorValue(MessageReceiverKind kind, Object selectorValue) {
+		if (selectorValue.equals(Selector.NONE)) {
 			final List<MessageReceiver> any = anySelector.get(kind);
-			return Collections.unmodifiableList((any == null) ? new ArrayList<MessageReceiver>() : any);
+			return any == null ? new ArrayList<MessageReceiver>() : Collections.unmodifiableList(any);
 		}
 
+		final List<MessageReceiver> receivers = selectorValue instanceof Class ? byType.get(kind) : byValue.get(kind);
 		final List<MessageReceiver> filtered = new ArrayList<MessageReceiver>();
-		final List<MessageReceiver> receivers = byValue.get(kind);
 
 		if (receivers != null) {
 			for (MessageReceiver receiver : receivers) {
-				if (selectorValue == receiver.selector()) {
+				if (selectorValue.equals(receiver.getSelector())) {
+					filtered.add(receiver);
+				}
+			}
+		}
+
+		return addReceiversMatchingAnySelector(kind, filtered);
+	}
+
+	List<MessageReceiver> getReceiversBySelectorType(MessageReceiverKind kind, Object selectorValue) {
+		if (selectorValue.equals(Selector.NONE)) {
+			final List<MessageReceiver> any = anySelector.get(kind);
+			return any == null ? new ArrayList<MessageReceiver>() : Collections.unmodifiableList(any);
+		}
+
+		final List<MessageReceiver> receivers = byType.get(kind);
+		final List<MessageReceiver> filtered = new ArrayList<MessageReceiver>();
+
+		if (receivers != null) {
+			for (MessageReceiver receiver : receivers) {
+				Class<?> type = (Class<?>) receiver.getSelector();
+				if (selectorValue.getClass().isAssignableFrom(type)) {
 					filtered.add(receiver);
 				}
 			}
@@ -108,23 +135,23 @@ class MessageReceiverCollection extends AbstractEventDispatcher<CollectionListen
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private final Class<?> messageType;
-	private final Map<MessageReceiverKind, List<MessageReceiver>> byValue;
-	private final Map<MessageReceiverKind, List<MessageReceiver>> anySelector;
-
 	private List<MessageReceiver> addReceiversMatchingAnySelector(MessageReceiverKind kind, List<MessageReceiver> receivers) {
-		final List<MessageReceiver> any = anySelector.get(kind);
-		if (any == null || any.size() == 0) {
-			return Collections.unmodifiableList(receivers);
+		final List<MessageReceiver> anys = anySelector.get(kind);
+		if (anys == null || anys.size() == 0) {
+			return receivers;
 		}
 
-		final List<MessageReceiver> result = new ArrayList<MessageReceiver>(receivers);
-		result.addAll(any);
-		return Collections.unmodifiableList(result);
+		if (receivers.size() > 0) {
+			receivers.addAll(anys);
+			return receivers;
+		}
+
+		return anys;
 	}
 
-	private Map<MessageReceiverKind, List<MessageReceiver>> getReceiverMap(int selector) {
-		return Selector.NONE == selector ? anySelector : byValue;
+	private Map<MessageReceiverKind, List<MessageReceiver>> getReceiverMap(MessageReceiver receiver) {
+		return receiver.getSelector() == null || receiver.getSelector().equals(Selector.NONE) ? anySelector
+				: receiver.getSelector() instanceof Class ? byType : byValue;
 	}
 
 	// This will not be needed anymore in Java 1.8. with lamba.

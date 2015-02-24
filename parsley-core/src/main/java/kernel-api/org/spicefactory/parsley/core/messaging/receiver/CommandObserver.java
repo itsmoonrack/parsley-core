@@ -12,7 +12,7 @@ public interface CommandObserver extends MessageReceiver {
 	/**
 	 * The status this observer is interested in.
 	 */
-	MessageReceiverKind kind();
+	MessageReceiverKind getKind();
 
 	/**
 	 * Invoked when a matching command starts or finishes its execution.

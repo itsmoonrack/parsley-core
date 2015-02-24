@@ -37,7 +37,7 @@ public interface MessageReceiverRegistry {
 	 * Removes an error handler from this registry.
 	 * @param handler the error handler to remove from this registry
 	 */
-	void removeErrorHandler(MessageExceptionHandler handler);
+	void removeExceptionHandler(MessageExceptionHandler handler);
 
 	/**
 	 * Adds an observer for a matching command execution to this registry.

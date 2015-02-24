@@ -1,6 +1,6 @@
 package org.spicefactory.parsley.core.bootstrap;
 
-import org.spicefactory.parsley.core.context.Context;
+import org.spicefactory.parsley.core.registry.Registry;
 
 /**
  * Responsible for processing configuration and adding object definitions to a context.
@@ -12,6 +12,6 @@ public interface ConfigurationProcessor {
 	 * Processes all configuration artifacts.
 	 * @param context the context to process
 	 */
-	void processConfiguration(Context context);
+	void processConfiguration(Registry registry);
 
 }

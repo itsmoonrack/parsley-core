@@ -1,9 +1,11 @@
 package org.spicefactory.parsley.command.swing;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.spicefactory.lib.command.adapter.CommandAdapter;
 import org.spicefactory.lib.command.adapter.CommandAdapterFactory;
+import org.spicefactory.lib.command.callback.ResultCallback;
 import org.spicefactory.parsley.command.annotation.MapCommand;
 
 /**
@@ -21,6 +23,19 @@ public class SwingCommandAdapterFactory implements CommandAdapterFactory {
 		// Command is assumed to be annotated.
 		boolean async = instance.getClass().getAnnotation(MapCommand.class).async();
 
+		Field callback = null;
+		try {
+			callback = instance.getClass().getField("callback");
+			if (callback.getType().isAssignableFrom(ResultCallback.class)) {
+				async = true;
+			} else {
+				callback = null;
+			}
+		}
+		catch (Exception e) {
+			// Nothing to do.
+		}
+
 		for (Method m : instance.getClass().getMethods()) {
 			if ("execute".equals(m.getName())) {
 				execute = m;
@@ -36,6 +51,6 @@ public class SwingCommandAdapterFactory implements CommandAdapterFactory {
 			}
 		}
 
-		return new SwingCommandAdapter(instance, execute, cancel, result, error, async);
+		return new SwingCommandAdapter(instance, execute, callback, cancel, result, error, async);
 	}
 }

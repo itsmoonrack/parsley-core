@@ -12,9 +12,7 @@ import org.spicefactory.parsley.command.trigger.TriggerB;
  */
 public class CommandObservers {
 
-	public int completeInvoked;
-	public int completeAInvoked;
-	public int completeBInvoked;
+	public int completeInvoked, completeAInvoked, completeBInvoked;
 
 	public List<Object> resultsA = new ArrayList<Object>();
 	public List<Object> resultsB = new ArrayList<Object>();

@@ -20,6 +20,6 @@ public interface Message {
 	/**
 	 * Returns selector to use to determine matching receivers.
 	 */
-	int selector();
+	int getSelector();
 
 }

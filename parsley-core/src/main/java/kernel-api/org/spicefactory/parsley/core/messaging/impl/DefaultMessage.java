@@ -34,7 +34,7 @@ public final class DefaultMessage implements Message {
 	}
 
 	@Override
-	public int selector() {
+	public int getSelector() {
 		return selector;
 	}
 

@@ -1,5 +1,6 @@
 package org.spicefactory.parsley.command.swing;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import javax.swing.SwingWorker;
@@ -9,6 +10,9 @@ import org.spicefactory.lib.command.adapter.CommandAdapter;
 import org.spicefactory.lib.command.base.AbstractSuspendableCommand;
 import org.spicefactory.lib.command.base.DefaultCommandResult;
 import org.spicefactory.lib.command.builder.CommandProxyBuilder;
+import org.spicefactory.lib.command.callback.CancelCallback;
+import org.spicefactory.lib.command.callback.ExceptionCallback;
+import org.spicefactory.lib.command.callback.ResultCallback;
 import org.spicefactory.lib.command.data.CommandData;
 import org.spicefactory.lib.command.data.DefaultCommandData;
 import org.spicefactory.lib.command.events.CommandEvent;
@@ -16,7 +20,6 @@ import org.spicefactory.lib.command.events.CommandException;
 import org.spicefactory.lib.command.lifecycle.CommandLifecycle;
 import org.spicefactory.lib.command.proxy.CommandProxy;
 import org.spicefactory.lib.command.result.ResultProcessors;
-import org.spicefactory.lib.event.EventListener;
 
 class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandAdapter {
 
@@ -25,6 +28,7 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 	private DefaultCommandData data = new DefaultCommandData();
 
 	private final Object target;
+	private final Field callbackField;
 	private final Method executeMethod;
 	private final Method cancelMethod;
 	private final Method resultMethod;
@@ -36,8 +40,9 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	public SwingCommandAdapter(Object target, Method execute, Method cancel, Method result, Method error, boolean async) {
+	public SwingCommandAdapter(Object target, Method execute, Field callback, Method cancel, Method result, Method error, boolean async) {
 		this.target = target;
+		this.callbackField = callback;
 		this.executeMethod = execute;
 		this.cancelMethod = cancel;
 		this.resultMethod = result;
@@ -98,13 +103,22 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 	@Override
 	protected void doExecute() {
 		lifecycle.beforeExecution(target, data);
+
+		try {
+			if (callbackField != null) {
+				callbackField.set(target, callback);
+			}
+		}
+		catch (Exception e) {
+			// Nothing we can do.
+		}
+
 		try {
 			if (async) {
 				worker.execute();
 			} else {
 				// Result can be null if invoked method return type is void.
 				Object result = executeMethod.invoke(target, getParameters());
-				System.err.println("invoke(target) > " + result);
 				handleResult(result);
 			}
 		}
@@ -118,6 +132,10 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 		Class<?>[] parameterTypes = executeMethod.getParameterTypes();
 		Object[] parameters = new Object[parameterTypes.length];
 		for (int i = 0; i < parameterTypes.length; ++i) {
+			if (parameterTypes[i].isAssignableFrom(ResultCallback.class)) {
+				parameters[i] = callback;
+				continue;
+			}
 			parameters[i] = data.getObject(parameterTypes[i]);
 		}
 		return parameters;
@@ -181,6 +199,13 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 		return value;
 	}
 
+	private void handleCancellation() {
+		// do not call cancel to bypass doCancel
+		afterCompletion(DefaultCommandResult.forCancellation(target));
+		resultProcessor = null;
+		dispatchEvent(new CommandEvent(CommandEvent.CANCEL));
+	}
+
 	private void processResult(CommandProxyBuilder builder) {
 		resultProcessor = builder //
 				.result(new CommandCompletionCallback()) //
@@ -221,29 +246,47 @@ class SwingCommandAdapter extends AbstractSuspendableCommand implements CommandA
 	// Pre-Java 8 implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private class CommandCompletionCallback implements EventListener<CommandEvent> {
+	private final ResultCallback<Object> callback = new ResultCallback<Object>() {
+		@Override
+		public void result(Object result) {
+			if (!isActive()) {
+				throw new IllegalStateException("Callback invoked although command " + target + " is not active");
+			}
+			if (result == null) {
+				handleCancellation();
+			} else if (result instanceof Throwable) {
+				handleException((Throwable) result);
+			} else {
+				handleResult(result);
+			}
+		}
+	};
+
+	private class CommandCompletionCallback implements ResultCallback<Object> {
 
 		@Override
-		public void process(CommandEvent event) {
+		public void result(Object result) {
 			System.err.println("CommandCompletionCallback");
 		}
 
 	}
 
-	private class CommandExceptionCallback implements EventListener<CommandEvent> {
+	private class CommandExceptionCallback implements ExceptionCallback<Throwable> {
 
 		@Override
-		public void process(CommandEvent event) {
+		public void exception(Throwable e) {
 			System.err.println("CommandExceptionCallback");
 		}
+
 	}
 
-	private class CommandCancellationCallback implements EventListener<CommandEvent> {
+	private class CommandCancellationCallback implements CancelCallback {
 
 		@Override
-		public void process(CommandEvent event) {
+		public void cancel() {
 			System.err.println("CommandCancellationCallback");
 		}
+
 	}
 
 }

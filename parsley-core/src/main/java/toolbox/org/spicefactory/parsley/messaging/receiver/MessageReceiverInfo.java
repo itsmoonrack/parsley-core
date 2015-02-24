@@ -1,7 +1,5 @@
 package org.spicefactory.parsley.messaging.receiver;
 
-import org.spicefactory.parsley.messaging.annotation.MessageHandler;
-
 /**
  * The base configuration for a message receiver.
  * <p>
@@ -14,10 +12,10 @@ public class MessageReceiverInfo {
 		// Do nothing.
 	}
 
-	public MessageReceiverInfo(MessageHandler info) {
-		this.type = info.type();
-		this.selector = info.selector();
-		this.order = info.order();
+	public MessageReceiverInfo(Class<?> type, Object selector, int order) {
+		this.type = type;
+		this.selector = selector;
+		this.order = order;
 	}
 
 	/**
@@ -32,7 +30,7 @@ public class MessageReceiverInfo {
 	 * message is an event and does not have a selector property specified explicitly.
 	 * </p>
 	 */
-	public int selector;
+	public Object selector;
 
 	/**
 	 * The execution order for this receiver. Will be processed in ascending order.

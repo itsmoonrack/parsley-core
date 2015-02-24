@@ -1,6 +1,7 @@
 package org.spicefactory.parsley.core.messaging.impl;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.spicefactory.lib.event.Event;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.Selector;
@@ -22,6 +24,12 @@ import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
  */
 // Package-private.
 class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionListener {
+
+	private final Class<?> messageType;
+	private final Field selectorField;
+	private final List<MessageReceiverCollection> collections;
+
+	private final ConcurrentMap<MessageReceiverKind, SelectorMap> selectorMaps;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
@@ -39,7 +47,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	 * @param collection the new collection to check
 	 */
 	void checkNewCollection(MessageReceiverCollection collection) {
-		if (messageType.isAssignableFrom(collection.messageType())) { // TODO: Check order of isAssignableFrom.
+		if (collection.getMessageType().isAssignableFrom(messageType)) {
 			collection.addEventListener(CollectionEvent.CHANGE, this);
 			selectorMaps.clear();
 			addListener(collection);
@@ -86,12 +94,6 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private final Class<?> messageType;
-	private final Field selectorField;
-	private final List<MessageReceiverCollection> collections;
-
-	private final ConcurrentMap<MessageReceiverKind, SelectorMap> selectorMaps;
-
 	private SelectorMap getSelectorMap(MessageReceiverKind kind) {
 		SelectorMap selectorMap = selectorMaps.get(kind);
 
@@ -115,7 +117,15 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 			c = c.getSuperclass();
 		}
 
-		return null;
+		try {
+			if (Event.class.isAssignableFrom(type)) {
+				return type.getField("id");
+			}
+			return null;
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	private void addListener(MessageReceiverCollection collection) {
@@ -135,26 +145,66 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	private class SelectorMap {
 
 		private final MessageReceiverKind kind;
-		private final Map<Object, List<MessageReceiver>> cache;
+		private final Map<Object, List<MessageReceiver>> byType;
+		private final Map<Object, List<MessageReceiver>> byValue;
 
 		public SelectorMap(MessageReceiverKind kind) {
 			this.kind = kind;
-			this.cache = new HashMap<Object, List<MessageReceiver>>();
+			this.byType = new HashMap<Object, List<MessageReceiver>>();
+			this.byValue = new HashMap<Object, List<MessageReceiver>>();
 		}
 
-		public List<MessageReceiver> getReceivers(int selector, ClassLoader loader) {
-			List<MessageReceiver> receivers = cache.get(selector);
+		public List<MessageReceiver> getReceivers(Object selector, ClassLoader loader) {
+			if (selector.equals(Selector.NONE) //
+					|| selector instanceof String //
+					|| selector instanceof Number //
+					|| selector instanceof Class) {
+				return getReceiversBySelectorValue(selector);
+			} else {
+				return getReceiversBySelectorType(selector, loader);
+			}
+		}
+
+		private List<MessageReceiver> getReceiversBySelectorValue(Object selector) {
+			List<MessageReceiver> receivers = byValue.get(selector);
 
 			if (receivers == null) {
 				receivers = new ArrayList<MessageReceiver>();
 				for (MessageReceiverCollection collection : collections) {
-					List<MessageReceiver> subset = collection.getReceiversBySelectorValue(kind, selector);
-					receivers.addAll(subset);
+					receivers.addAll(collection.getReceiversBySelectorValue(kind, selector));
 				}
-				cache.put(selector, receivers);
+				byValue.put(selector, receivers);
 			}
 
 			return receivers;
+		}
+
+		private List<MessageReceiver> getReceiversBySelectorType(Object selector, ClassLoader loader) {
+			Class<?> type = getSelectorType(selector, loader);
+			List<MessageReceiver> receivers = byType.get(type);
+
+			if (receivers == null) {
+				receivers = new ArrayList<MessageReceiver>();
+				for (MessageReceiverCollection collection : collections) {
+					receivers.addAll(collection.getReceiversBySelectorType(kind, selector));
+				}
+				byType.put(type, receivers);
+			}
+
+			return receivers;
+		}
+
+		private Class<?> getSelectorType(Object selector, ClassLoader loader) {
+			Class<?> c = null;
+			if (!(selector instanceof Proxy && selector instanceof Number)) {
+				// Cannot rely on Proxy subclasses to support the constructor property.
+				// For Number instance constructor property always returns Number (never int).
+				c = selector.getClass();
+			}
+			//			if (c == null) {
+			//					c = loader.loadClass(selector.getClass().getCanonicalName());
+			//			}
+			return c;
 		}
 	}
 

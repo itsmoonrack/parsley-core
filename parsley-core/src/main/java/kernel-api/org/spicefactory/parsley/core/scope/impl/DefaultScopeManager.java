@@ -33,9 +33,9 @@ import org.spicefactory.parsley.core.scope.ScopeManager;
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
 @Singleton
-public class GuiceScopeManager implements ScopeManager {
+public class DefaultScopeManager implements ScopeManager {
 
-	private final Logger logger = LoggerFactory.getLogger(GuiceScopeManager.class);
+	private final Logger logger = LoggerFactory.getLogger(DefaultScopeManager.class);
 
 	private final Map<String, Scope> scopes;
 	private final MessageRouter messageRouter;
@@ -47,7 +47,7 @@ public class GuiceScopeManager implements ScopeManager {
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Inject
-	GuiceScopeManager(ScopeInfoRegistry scopeInfoRegistry, MessageRouter messageRouter, CommandManager commandManager) {
+	DefaultScopeManager(ScopeInfoRegistry scopeInfoRegistry, MessageRouter messageRouter, CommandManager commandManager) {
 		this.scopes = new HashMap<String, Scope>();
 		this.messageRouter = messageRouter;
 		this.commandManager = commandManager;
@@ -74,7 +74,7 @@ public class GuiceScopeManager implements ScopeManager {
 			addScope(scopeInfo, info);
 		}
 		for (ScopeDefinition scopeDef : scopeInfoRegistry.getNewScopes()) {
-			ScopeInfo newScope = new GuiceScopeInfo(scopeDef, commandManager);
+			ScopeInfo newScope = new DefaultScopeInfo(scopeDef, commandManager);
 			addScope(newScope, info);
 		}
 	}
@@ -85,8 +85,8 @@ public class GuiceScopeManager implements ScopeManager {
 	 * @param info the environment of the Context building process
 	 */
 	protected void addScope(ScopeInfo scopeInfo, /* TODO: not used. */BootstrapInfo info) {
-		if (scopes.containsKey(scopeInfo.name())) {
-			throw new IllegalStateException("Duplicate scope with name: " + scopeInfo.name());
+		if (scopes.containsKey(scopeInfo.getName())) {
+			throw new IllegalStateException("Duplicate scope with name: " + scopeInfo.getName());
 		}
 		scopeInfoRegistry.addActiveScope(scopeInfo);
 		Scope scope = new DefaultScope(scopeInfo, messageRouter);
@@ -113,8 +113,13 @@ public class GuiceScopeManager implements ScopeManager {
 	}
 
 	@Override
-	public void dispatchMessage(Object instance, int selector) {
-		final Class<?> type = instance.getClass();
+	public void dispatchMessage(Object message) {
+		dispatchMessage(message, Selector.NONE);
+	}
+
+	@Override
+	public void dispatchMessage(Object message, int selector) {
+		final Class<?> type = message.getClass();
 		final List<ScopeInfo> scopes = scopeInfoRegistry.getActiveScopes();
 		final List<MessageReceiverCache> caches = new ArrayList<MessageReceiverCache>(scopes.size());
 
@@ -124,31 +129,32 @@ public class GuiceScopeManager implements ScopeManager {
 		final MessageReceiverCache cache = new MergedMessageReceiverCache(caches);
 
 		if (selector == Selector.NONE) {
-			selector = cache.getSelectorValue(instance);
+			selector = cache.getSelectorValue(message);
 		}
-		final Message message = new DefaultMessage(instance, type, selector);
+		final Message instance = new DefaultMessage(message, type, selector);
 
 		if (cache.getReceivers(MessageReceiverKind.TARGET, selector).size() == 0) {
 			logger.warn("Discarding message '{}': no matching receiver in any scope.", type.getName());
 			return;
 		}
 
-		messageRouter.dispatchMessage(message, cache);
+		messageRouter.dispatchMessage(instance, cache);
 	}
 
 	@Override
 	public void observeCommand(ObservableCommand command) {
-		List<MessageReceiverCache> typeCaches = new ArrayList<MessageReceiverCache>();
-		List<MessageReceiverCache> triggerCaches = new ArrayList<MessageReceiverCache>();
+		final List<MessageReceiverCache> typeCaches = new ArrayList<MessageReceiverCache>();
+		final List<MessageReceiverCache> triggerCaches = new ArrayList<MessageReceiverCache>();
 		for (ScopeInfo scope : scopeInfoRegistry.getActiveScopes()) {
-			if (command.trigger() != null) {
-				triggerCaches.add(scope.getMessageReceiverCache(command.trigger().type()));
+			if (command.getTrigger() != null) {
+				triggerCaches.add(scope.getMessageReceiverCache(command.getTrigger().type()));
 			}
-			typeCaches.add(scope.getMessageReceiverCache(command.type()));
+			typeCaches.add(scope.getMessageReceiverCache(command.getType()));
+			scope.addActiveCommand(command);
 		}
 		CommandHandler commandHandler = new CommandHandler(typeCaches, triggerCaches);
 		command.observe(commandHandler);
-		commandHandler.update(command);
+		commandHandler.handleCommand(command);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -166,11 +172,11 @@ public class GuiceScopeManager implements ScopeManager {
 		}
 
 		@Override
-		public void update(ObservableCommand command) {
+		public void handleCommand(ObservableCommand command) {
 			if (!hasReceivers(command)) {
 				if (logger.isDebugEnabled()) {
-					logger.debug("Discarding command status {} for message '{}': no matching observer.", command.status(),
-							(command.trigger() == null ? "no trigger" : command.trigger().getInstance().getClass()));
+					logger.debug("Discarding command status {} for message '{}': no matching observer.", command.getStatus(),
+							(command.getTrigger() == null ? "no trigger" : command.getTrigger().getInstance().getClass()));
 				}
 				return;
 			}
@@ -178,12 +184,12 @@ public class GuiceScopeManager implements ScopeManager {
 		}
 
 		private boolean hasReceivers(ObservableCommand command) {
-			if (command.trigger() != null
-					&& triggerCache.getReceivers(MessageReceiverKind.forCommandStatus(command.status(), true), command.trigger().selector())
+			if (command.getTrigger() != null
+					&& triggerCache.getReceivers(MessageReceiverKind.forCommandStatus(command.getStatus(), true), command.getTrigger().getSelector())
 							.size() > 0) {
 				return true;
 			}
-			return typeCache.getReceivers(MessageReceiverKind.forCommandStatus(command.status(), false), command.id()).size() > 0;
+			return typeCache.getReceivers(MessageReceiverKind.forCommandStatus(command.getStatus(), false), command.getId()).size() > 0;
 		}
 
 	}

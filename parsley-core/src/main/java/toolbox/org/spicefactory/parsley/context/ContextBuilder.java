@@ -1,8 +1,11 @@
 package org.spicefactory.parsley.context;
 
+import javax.annotation.Nullable;
+
 import org.spicefactory.parsley.core.bootstrap.BootstrapProcessor;
 import org.spicefactory.parsley.core.bootstrap.ConfigurationProcessor;
 import org.spicefactory.parsley.core.context.Context;
+import org.spicefactory.parsley.runtime.processor.RuntimeConfigurationProcessor;
 
 /**
  * A ContextBuilder offers the option to create a new Context programmatically using the convenient configuration DSL.
@@ -38,6 +41,7 @@ import org.spicefactory.parsley.core.context.Context;
 public final class ContextBuilder {
 
 	private final BootstrapProcessor processor;
+	private RuntimeConfigurationProcessor runtimeConfig;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
@@ -81,6 +85,34 @@ public final class ContextBuilder {
 	public ContextBuilder config(ConfigurationProcessor processor) {
 		this.processor.addProcessor(processor);
 		return this;
+	}
+
+	/**
+	 * Adds an existing instance to the Context created by this builder.
+	 * <p>
+	 * The only way to apply framework features to the target instance is meta-data in this case.
+	 * @param instance the instance to add to the Context
+	 * @return this builder instance for method chaining
+	 */
+	public ContextBuilder object(Object instance) {
+		return object(instance, null);
+	}
+
+	/**
+	 * Adds an existing instance to the Context created by this builder.
+	 * <p>
+	 * The only way to apply framework features to the target instance is meta-data in this case.
+	 * @param instance the instance to add to the Context
+	 * @param id the optional id of the instance
+	 * @return this builder instance for method chaining
+	 */
+	public ContextBuilder object(Object instance, @Nullable String id) {
+		if (runtimeConfig == null) {
+			runtimeConfig = new RuntimeConfigurationProcessor();
+			processor.addProcessor(runtimeConfig);
+		}
+		runtimeConfig.addInstance(instance, id);
+		return null;
 	}
 
 	/**

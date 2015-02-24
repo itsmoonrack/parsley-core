@@ -8,7 +8,7 @@ import org.spicefactory.parsley.core.command.ManagedCommandFactory;
 import org.spicefactory.parsley.core.command.ManagedCommandProxy;
 import org.spicefactory.parsley.core.context.Context;
 
-public class GuiceCommandBinder {
+public class MappedCommandBinder {
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.

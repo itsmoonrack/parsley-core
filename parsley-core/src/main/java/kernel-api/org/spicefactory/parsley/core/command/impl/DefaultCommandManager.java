@@ -30,13 +30,18 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	}
 
 	@Override
-	public void update(ObservableCommand command) {
+	public void handleCommand(ObservableCommand command) {
 		commands.remove(command);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Public API.
 	/////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public boolean hasActiveCommandsForTrigger(Class<?> messageType) {
+		return hasActiveCommandsForTrigger(messageType, Selector.NONE);
+	}
 
 	@Override
 	public boolean hasActiveCommandsForTrigger(Class<?> messageType, int selector) {
@@ -46,6 +51,22 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public boolean hasActiveCommandsOfType(Class<?> commandType) {
+		return hasActiveCommandsOfType(commandType, null);
+	}
+
+	@Override
+	public boolean hasActiveCommandsOfType(Class<?> commandType, String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType) {
+		return getActiveCommandsByTrigger(messageType, Selector.NONE);
 	}
 
 	@Override
@@ -60,13 +81,12 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	}
 
 	@Override
-	public boolean hasActiveCommandsOfType(Class<?> commandType, int id) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<ObservableCommand> getActiveCommandsByType(Class<?> commandType) {
+		return getActiveCommandsByType(commandType, null);
 	}
 
 	@Override
-	public List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, int id) {
+	public List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -76,7 +96,7 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	/////////////////////////////////////////////////////////////////////////////
 
 	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, int selector) {
-		return (command.trigger() != null && messageType.isAssignableFrom(command.trigger().getInstance().getClass()) && (selector == Selector.NONE || selector == command
-				.trigger().selector()));
+		return (command.getTrigger() != null && messageType.isAssignableFrom(command.getTrigger().getInstance().getClass()) && (selector == Selector.NONE || selector == command
+				.getTrigger().getSelector()));
 	}
 }

@@ -2,13 +2,15 @@ package org.spicefactory.parsley.core.registry;
 
 import org.spicefactory.parsley.core.context.Context;
 
+import com.google.inject.Injector;
+
 /**
  * A registry of abstract objects.
  * <p>
  * Parsley does not come with implementation of object registry so you must use a suitable IoC framework such as Guice or Spring at runtime.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public interface Registry {
+public interface Registry extends Injector {
 
 	/**
 	 * The Context associated with this registry.
@@ -18,11 +20,5 @@ public interface Registry {
 	 * for later use.
 	 */
 	Context getContext();
-
-	/**
-	 * Returns the appropriate instance for the given injection type; When feasible, avoid using this method, in favor of having Context inject
-	 * your dependencies ahead of time.
-	 */
-	<T> T getInstance(Class<T> type);
 
 }

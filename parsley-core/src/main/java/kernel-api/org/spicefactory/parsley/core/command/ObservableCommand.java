@@ -14,38 +14,38 @@ public interface ObservableCommand {
 	 * The message that triggered the command. This property is null when the command was started programmatically.
 	 */
 	@Nullable
-	Message trigger();
+	Message getTrigger();
 
 	/**
 	 * The actual command instance.
 	 */
-	Object command();
+	Object getCommand();
 
 	/**
 	 * The id the command is registered with in the Context.
 	 */
-	int id();
+	int getId();
 
 	/**
 	 * The type of the command.
 	 */
-	Class<?> type();
+	Class<?> getType();
 
 	/**
 	 * The result produced by the command.
 	 */
-	Object result();
+	Object getResult();
 
 	/**
 	 * The status of the command.
 	 */
-	CommandStatus status();
+	CommandStatus getStatus();
 
 	/**
 	 * Indicates whether this command is a root command or a nested command. This property is true if the command is a simple standalone command
 	 * or the root command of a sequence or flow. It is flow if it is a command nested in a sequence or flow.
 	 */
-	boolean root();
+	boolean isRoot();
 
 	/**
 	 * Observes the completion of this command, no matter whether it successfully completes, aborts with an error or gets cancelled. The callback
@@ -62,7 +62,7 @@ public interface ObservableCommand {
 		/**
 		 * This method is called whenever the observed command has changed.
 		 */
-		void update(ObservableCommand command);
+		void handleCommand(ObservableCommand command);
 
 	}
 

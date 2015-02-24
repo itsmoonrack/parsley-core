@@ -1,8 +1,9 @@
 package org.spicefactory.parsley.command;
 
 import org.spicefactory.lib.command.builder.CommandProxyBuilder;
-import org.spicefactory.lib.command.events.CommandEvent;
-import org.spicefactory.lib.event.EventListener;
+import org.spicefactory.lib.command.callback.CancelCallback;
+import org.spicefactory.lib.command.callback.ExceptionCallback;
+import org.spicefactory.lib.command.callback.ResultCallback;
 import org.spicefactory.parsley.command.impl.DefaultManagedCommandProxy;
 import org.spicefactory.parsley.core.command.ManagedCommandProxy;
 import org.spicefactory.parsley.core.context.Context;
@@ -77,7 +78,7 @@ public class ManagedCommandBuilder {
 	 * @param callback the callback to invoke when the command completes successfully
 	 * @return this builder instance for method chaining
 	 */
-	public ManagedCommandBuilder result(EventListener<CommandEvent> callback) {
+	public ManagedCommandBuilder result(ResultCallback<?> callback) {
 		builder.result(callback);
 		return this;
 	}
@@ -90,7 +91,7 @@ public class ManagedCommandBuilder {
 	 * @param callback the callback to invoke when the command produced an error
 	 * @return this builder instance for method chaining
 	 */
-	public ManagedCommandBuilder exception(EventListener<CommandEvent> callback) {
+	public ManagedCommandBuilder exception(ExceptionCallback<?> callback) {
 		builder.exception(callback);
 		return this;
 	}
@@ -103,7 +104,7 @@ public class ManagedCommandBuilder {
 	 * @param callback the callback to invoke when the command gets cancelled
 	 * @return this builder instance for method chaining
 	 */
-	public ManagedCommandBuilder cancel(EventListener<CommandEvent> callback) {
+	public ManagedCommandBuilder cancel(CancelCallback callback) {
 		builder.cancel(callback);
 		return this;
 	}

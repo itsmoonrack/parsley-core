@@ -17,6 +17,7 @@ import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.context.ContextListener;
 import org.spicefactory.parsley.core.events.ContextEvent;
 import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
+import org.spicefactory.parsley.core.scope.Scope;
 import org.spicefactory.parsley.messaging.receiver.MessageReceiverInfo;
 
 /**
@@ -32,7 +33,7 @@ public class MappedCommandBuilder implements ContextListener {
 	private final ManagedCommandFactory factory;
 	private final MessageReceiverInfo info = new MessageReceiverInfo();
 
-	private String scope;
+	private String scope = Scope.GLOBAL;
 	private Class<?> messageType;
 	private MessageTarget target;
 

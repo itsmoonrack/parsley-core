@@ -125,7 +125,7 @@ class DefaultMessageProcessor implements MessageProcessor {
 	 * @return the receivers for the message type and receiver kind this processor handles
 	 */
 	protected List<MessageReceiver> fetchReceivers() {
-		return cache.getReceivers(MessageReceiverKind.TARGET, message.selector());
+		return cache.getReceivers(MessageReceiverKind.TARGET, message.getSelector());
 	}
 
 	protected void invokeReceiver(MessageReceiver target) {
@@ -234,9 +234,9 @@ class DefaultMessageProcessor implements MessageProcessor {
 
 		@Override
 		public int compare(MessageReceiver a, MessageReceiver b) {
-			if (a.order() > b.order()) {
+			if (a.getOrder() > b.getOrder()) {
 				return 1;
-			} else if (a.order() < b.order()) {
+			} else if (a.getOrder() < b.getOrder()) {
 				return -1;
 			}
 			return 0;

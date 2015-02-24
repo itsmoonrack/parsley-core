@@ -2,7 +2,7 @@ package org.spicefactory.parsley.guice.processor;
 
 import org.spicefactory.parsley.GuiceParsley;
 import org.spicefactory.parsley.core.bootstrap.ConfigurationProcessor;
-import org.spicefactory.parsley.core.context.Context;
+import org.spicefactory.parsley.core.registry.Registry;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -21,7 +21,7 @@ public class GuiceConfigurationProcessor implements ConfigurationProcessor {
 	}
 
 	@Override
-	public void processConfiguration(Context context) {
+	public void processConfiguration(Registry registry) {
 		injector = GuiceParsley.createInjector(stage, modules);
 	}
 

@@ -1,46 +1,54 @@
 package org.spicefactory.parsley.core.context.impl;
 
-import javax.inject.Inject;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.spicefactory.lib.event.AbstractEventDispatcher;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.spicefactory.lib.command.adapter.CommandAdapterFactory;
+import org.spicefactory.lib.command.adapter.CommandAdapters;
+import org.spicefactory.lib.event.EventDispatcher;
+import org.spicefactory.parsley.command.MappedCommandBuilder;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.context.ContextListener;
 import org.spicefactory.parsley.core.events.ContextEvent;
-import org.spicefactory.parsley.core.registry.Registry;
 import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.core.view.ViewManager;
 
-public final class DefaultContext extends AbstractEventDispatcher<ContextListener, ContextEvent> implements Context, ContextListener {
+import com.google.inject.Injector;
+
+@Singleton
+public class DefaultContext extends EventDispatcher<ContextListener, ContextEvent> implements Context {
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Package-private.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Inject
-	private Logger logger;
-
-	private Registry registry;
-
-	private final Context[] parents;
-	private final ViewManager viewManager;
+	Injector injector;
 
 	@Inject
-	public DefaultContext(ViewManager viewManager, Context[] parents) {
-		this.parents = parents;
-		this.viewManager = viewManager;
+	ScopeManager scopeManager;
 
-		addEventListener(ContextEvent.DESTROYED, this);
-		for (Context p : parents) {
-			p.addEventListener(ContextEvent.DESTROYED, new ParentContextListener());
+	@Inject
+	void mapCommandFactory(CommandAdapterFactory factory) {
+		// Adds this factory to the registry of command adapters.
+		// We consider that it is configuration code hence it is
+		// acceptable to make use of static keyword in this case
+		// so it remains in the JVM between application restarts.
+		CommandAdapters.addFactory(factory);
+	}
+
+	@Inject
+	void mapCommands(List<MappedCommandBuilder> mappedCommands) {
+		for (MappedCommandBuilder aMappedCommand : mappedCommands) {
+			aMappedCommand.register(this);
 		}
 	}
 
-	public void setRegistry(Registry registry) {
-		this.registry = registry;
-	}
-
-	@Override
-	public <T> T getInstance(Class<T> type) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public void injectMembers(Object instance) {
@@ -49,41 +57,51 @@ public final class DefaultContext extends AbstractEventDispatcher<ContextListene
 	}
 
 	@Override
+	public <T> T getInstance(Class<T> type) {
+		return injector.getInstance(type);
+	}
+
+	@Override
+	public Context[] getParents() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ScopeManager getScopeManager() {
+		return scopeManager;
+	}
+
+	@Override
+	public ViewManager getViewManager() {
+		return null;
+	}
+
+	@Override
+	public boolean isConfigured() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isInitialized() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
-	public void process(ContextEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	private class ParentContextListener implements ContextListener {
-
-		@Override
-		public void process(ContextEvent event) {
-			// TODO Auto-generated method stub
-
-		}
-
-	}
-
-	@Override
-	public Context[] getParents() {
-		return parents;
-	}
-
-	@Override
-	public ViewManager getViewManager() {
-		return viewManager;
-	}
-
-	@Override
-	public ScopeManager getScopeManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	/////////////////////////////////////////////////////////////////////////////
+	// Internal implementation.
+	/////////////////////////////////////////////////////////////////////////////
 }

@@ -17,6 +17,11 @@ import org.spicefactory.parsley.core.command.ObservableCommand;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.core.messaging.Message;
 
+/**
+ * Extension of the stand-alone CommandLifecycle from Spicelib that deals with adding and removing commands to/from the Context during execution
+ * and passing them to the CommandManager.
+ * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
+ */
 public class ManagedCommandLifecycle implements CommandLifecycle {
 
 	private final Context context;
@@ -104,27 +109,27 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 		}
 
 		@Override
-		public Message trigger() {
+		public Message getTrigger() {
 			return trigger;
 		}
 
 		@Override
-		public Object command() {
+		public Object getCommand() {
 			return command;
 		}
 
 		@Override
-		public int id() {
+		public int getId() {
 			return id;
 		}
 
 		@Override
-		public Class<?> type() {
+		public Class<?> getType() {
 			return type;
 		}
 
 		@Override
-		public Object result() {
+		public Object getResult() {
 			return result;
 		}
 
@@ -133,18 +138,18 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 					(result.complete() ? CommandStatus.COMPLETE : (result.getValue() == null ? CommandStatus.CANCEL : CommandStatus.ERROR));
 			this.result = result.getValue();
 			for (CommandObserver callback : callbacks) {
-				callback.update(this);
+				callback.handleCommand(this);
 			}
 			callbacks.clear();
 		}
 
 		@Override
-		public CommandStatus status() {
+		public CommandStatus getStatus() {
 			return status;
 		}
 
 		@Override
-		public boolean root() {
+		public boolean isRoot() {
 			return root;
 		}
 

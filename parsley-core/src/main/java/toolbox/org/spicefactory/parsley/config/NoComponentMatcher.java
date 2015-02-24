@@ -1,4 +1,4 @@
-package org.spicefactory.parsley;
+package org.spicefactory.parsley.config;
 
 import java.awt.Component;
 

@@ -14,13 +14,20 @@ import org.spicefactory.parsley.core.scope.ScopeInfo;
  * Default implementation of the ScopeInfo interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public class GuiceScopeInfo implements ScopeInfo {
+public class DefaultScopeInfo implements ScopeInfo {
+
+	private final String name;
+	private final String uuid;
+	private final boolean inherited;
+	private final DefaultMessageReceiverRegistry messageReceivers;
+
+	private final CommandManager commandManager;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	public GuiceScopeInfo(ScopeDefinition definition, CommandManager commandManager /*, BootstrapInfo info*/) {
+	public DefaultScopeInfo(ScopeDefinition definition, CommandManager commandManager /*, BootstrapInfo info*/) {
 		this.name = definition.name();
 		this.uuid = definition.uuid();
 		this.inherited = definition.inherited();
@@ -41,28 +48,28 @@ public class GuiceScopeInfo implements ScopeInfo {
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public String name() {
+	public String getName() {
 		return name;
 	}
 
 	@Override
-	public String uuid() {
+	public String getUuid() {
 		return uuid;
 	}
 
 	@Override
-	public boolean inherited() {
+	public boolean isInherited() {
 		return inherited;
 	}
 
 	@Override
-	public Context rootContext() {
+	public Context getRootContext() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public MessageReceiverRegistry messageReceivers() {
+	public MessageReceiverRegistry getMessageReceivers() {
 		return messageReceivers;
 	}
 
@@ -72,7 +79,7 @@ public class GuiceScopeInfo implements ScopeInfo {
 	}
 
 	@Override
-	public CommandManager commandManager() {
+	public CommandManager getCommandManager() {
 		return commandManager;
 	}
 
@@ -84,12 +91,5 @@ public class GuiceScopeInfo implements ScopeInfo {
 	/////////////////////////////////////////////////////////////////////////////
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
-
-	private final String name;
-	private final String uuid;
-	private final boolean inherited;
-	private final DefaultMessageReceiverRegistry messageReceivers;
-
-	private final CommandManager commandManager;
 
 }

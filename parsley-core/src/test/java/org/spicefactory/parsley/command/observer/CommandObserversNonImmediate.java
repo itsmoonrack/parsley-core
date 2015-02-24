@@ -2,6 +2,8 @@ package org.spicefactory.parsley.command.observer;
 
 import java.util.Date;
 
+import javax.inject.Singleton;
+
 import org.spicefactory.lib.command.data.CommandData;
 import org.spicefactory.parsley.command.trigger.Trigger;
 import org.spicefactory.parsley.comobserver.annotation.CommandResult;
@@ -9,6 +11,7 @@ import org.spicefactory.parsley.comobserver.annotation.CommandResult;
 /**
  * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
  */
+@Singleton
 public class CommandObserversNonImmediate {
 
 	public boolean firstResult;

@@ -43,6 +43,13 @@ public interface ScopeManager {
 	 * Dispatches a message through all scopes managed by this instance. In many cases you'll want to dispatch application messages through all
 	 * scopes so that the receiving side can decide which scope it wants to listen for.
 	 * @param message the message to dispatch
+	 */
+	void dispatchMessage(Object message);
+
+	/**
+	 * Dispatches a message through all scopes managed by this instance. In many cases you'll want to dispatch application messages through all
+	 * scopes so that the receiving side can decide which scope it wants to listen for.
+	 * @param message the message to dispatch
 	 * @param selector the selector to use if it cannot be determined from the message instance itself
 	 */
 	void dispatchMessage(Object message, int selector);

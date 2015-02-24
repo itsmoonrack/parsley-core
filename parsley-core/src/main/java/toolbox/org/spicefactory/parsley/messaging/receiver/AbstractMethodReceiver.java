@@ -4,8 +4,24 @@ import java.lang.reflect.Method;
 
 import javax.inject.Provider;
 
+/**
+ * Abstract base class for all message handlers where the message is handled by a method invocation on the target instance.
+ * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
+ */
 public abstract class AbstractMethodReceiver extends AbstractProviderReceiver implements MethodReceiver {
 
+	/**
+	 * The method to invoke for matching messages.
+	 */
+	protected Method targetMethod;
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Package-private.
+	/////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Creates a new instance.
 	 * @param info the mapping information for this receiver
@@ -20,10 +36,9 @@ public abstract class AbstractMethodReceiver extends AbstractProviderReceiver im
 		targetMethod = method;
 	}
 
-	/**
-	 * The method to invoke for matching messages.
-	 */
-	protected Method targetMethod;
+	/////////////////////////////////////////////////////////////////////////////
+	// Internal implementation.
+	/////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Returns the Class to use as the message type.

@@ -17,6 +17,9 @@ import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
 @Singleton
 public class DefaultMessageReceiverRegistry implements MessageReceiverRegistry {
 
+	private final Map<Class<?>, MessageReceiverCollection> receivers;
+	private final Map<Class<?>, DefaultMessageReceiverCache> selectionCache;
+
 	public DefaultMessageReceiverRegistry() {
 		// TODO: Check maps implementation + concurrency.
 		receivers = new HashMap<Class<?>, MessageReceiverCollection>();
@@ -34,13 +37,12 @@ public class DefaultMessageReceiverRegistry implements MessageReceiverRegistry {
 		if (receiverSelection == null) {
 			List<MessageReceiverCollection> collections = new ArrayList<MessageReceiverCollection>();
 			for (MessageReceiverCollection collection : receivers.values()) {
-				if (messageType.isAssignableFrom(collection.messageType())) { // TODO: Check order of isAssignableFrom.
+				if (collection.getMessageType().isAssignableFrom(messageType)) {
 					collections.add(collection);
 				}
 			}
 			receiverSelection = new DefaultMessageReceiverCache(messageType, collections);
 			selectionCache.put(messageType, receiverSelection);
-			//			domainManager.addPurgeHandler(messageType.getClassLoader(), clearDomainCache, messageType);
 		}
 
 		return receiverSelection;
@@ -62,32 +64,29 @@ public class DefaultMessageReceiverRegistry implements MessageReceiverRegistry {
 	}
 
 	@Override
-	public void removeErrorHandler(MessageExceptionHandler handler) {
+	public void removeExceptionHandler(MessageExceptionHandler handler) {
 		removeReceiver(MessageReceiverKind.ERROR_HANDLER, handler);
 	}
 
 	@Override
 	public void addCommandObserver(CommandObserver observer) {
-		addReceiver(observer.kind(), observer);
+		addReceiver(observer.getKind(), observer);
 	}
 
 	@Override
 	public void removeCommandObserver(CommandObserver observer) {
-		removeReceiver(observer.kind(), observer);
+		removeReceiver(observer.getKind(), observer);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	// Internals.
 	///////////////////////////////////////////////////////////////////////////////
 
-	private final Map<Class<?>, MessageReceiverCollection> receivers;
-	private final Map<Class<?>, DefaultMessageReceiverCache> selectionCache;
-
 	private void addReceiver(MessageReceiverKind kind, MessageReceiver receiver) {
-		MessageReceiverCollection collection = receivers.get(receiver.type());
+		MessageReceiverCollection collection = receivers.get(receiver.getType());
 		if (collection == null) {
-			collection = new MessageReceiverCollection(receiver.type());
-			receivers.put(receiver.type(), collection);
+			collection = new MessageReceiverCollection(receiver.getType());
+			receivers.put(receiver.getType(), collection);
 			for (DefaultMessageReceiverCache cache : selectionCache.values()) {
 				cache.checkNewCollection(collection);
 			}
@@ -96,7 +95,7 @@ public class DefaultMessageReceiverRegistry implements MessageReceiverRegistry {
 	}
 
 	private void removeReceiver(MessageReceiverKind kind, MessageReceiver receiver) {
-		MessageReceiverCollection collection = receivers.get(receiver.type());
+		MessageReceiverCollection collection = receivers.get(receiver.getType());
 		if (collection == null) {
 			return;
 		}

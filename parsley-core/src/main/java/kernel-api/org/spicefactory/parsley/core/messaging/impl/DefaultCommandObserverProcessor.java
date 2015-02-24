@@ -26,12 +26,12 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 
 	DefaultCommandObserverProcessor(ObservableCommand observable, MessageReceiverCache typeCache, MessageReceiverCache triggerCache,
 			MessageSettings settings) {
-		super(observable.trigger(), triggerCache, settings);
+		super(observable.getTrigger(), triggerCache, settings);
 
 		this.typeCache = typeCache;
 		this.observable = observable;
-		this.status = observable.status();
-		this.result = observable.result();
+		this.status = observable.getStatus();
+		this.result = observable.getResult();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -39,28 +39,28 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public Object command() {
-		return observable.command();
+	public Object getCommand() {
+		return observable.getCommand();
 	}
 
 	@Override
-	public Object result() {
+	public Object getResult() {
 		return result;
 	}
 
 	@Override
-	public CommandStatus commandStatus() {
+	public CommandStatus getCommandStatus() {
 		return status;
 	}
 
 	@Override
-	public boolean root() {
-		return observable.root();
+	public boolean isRoot() {
+		return observable.isRoot();
 	}
 
 	@Override
 	public void changeResult(Object result, boolean error) {
-		if (commandStatus() == CommandStatus.EXECUTE) {
+		if (getCommandStatus() == CommandStatus.EXECUTE) {
 			throw new IllegalStateException("Cannot set the result while command is still executing.");
 		}
 		this.result = result;
@@ -73,10 +73,13 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 
 	@Override
 	protected List<MessageReceiver> fetchReceivers() {
-		List<MessageReceiver> receivers = typeCache.getReceivers(MessageReceiverKind.forCommandStatus(commandStatus(), false), observable.id());
+		System.err.println("fetchReceivers for command status: " + getCommandStatus());
+		List<MessageReceiver> receivers =
+				typeCache.getReceivers(MessageReceiverKind.forCommandStatus(getCommandStatus(), false), observable.getId());
 
-		if (observable.trigger() != null) {
-			receivers.addAll(cache.getReceivers(MessageReceiverKind.forCommandStatus(commandStatus(), true), observable.trigger().selector()));
+		if (observable.getTrigger() != null) {
+			receivers.addAll(cache.getReceivers(MessageReceiverKind.forCommandStatus(getCommandStatus(), true), observable.getTrigger()
+					.getSelector()));
 		}
 
 		return receivers;
@@ -84,17 +87,17 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 
 	@Override
 	protected void invokeReceiver(MessageReceiver observer) {
-		CommandStatus oldStatus = commandStatus();
+		CommandStatus oldStatus = getCommandStatus();
 		((CommandObserver) observer).observeCommand(this);
-		if (oldStatus != commandStatus() && oldStatus != CommandStatus.EXECUTE) {
+		if (oldStatus != getCommandStatus() && oldStatus != CommandStatus.EXECUTE) {
 			rewind();
 		}
 	}
 
 	@Override
 	protected String getTraceString(String status, int receiverCount) {
-		return MessageFormat.format("{0} message '{1}' for command status '{2}' to {3} observer(s).", status, message.type(), commandStatus(),
-				receiverCount);
+		return MessageFormat.format("{0} message '{1}' for command status '{2}' to {3} observer(s).", status, message.type(),
+				getCommandStatus(), receiverCount);
 	}
 
 }

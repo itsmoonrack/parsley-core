@@ -11,12 +11,12 @@ public interface MessageReceiver {
 	 * <p>
 	 * In case of a command observer this may also be interpreted as the type of the command, depending on the kind of receiver.
 	 */
-	Class<?> type();
+	Class<?> getType();
 
 	/**
 	 * An optional selector value to be used for selecting matching messages.
 	 */
-	int selector();
+	Object getSelector();
 
 	/**
 	 * The execution order for this receiver.
@@ -24,6 +24,6 @@ public interface MessageReceiver {
 	 * Will be processed in ascending order. The default is <code>Integer.MAX_VALUE</code>.
 	 * </p>
 	 */
-	int order();
+	int getOrder();
 
 }

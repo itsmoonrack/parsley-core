@@ -16,27 +16,27 @@ public interface ScopeInfo {
 	/**
 	 * The name of the scope.
 	 */
-	String name();
+	String getName();
 
 	/**
 	 * The unique id of the scope.
 	 */
-	String uuid();
+	String getUuid();
 
 	/**
 	 * Indicates whether this scope will be inherited by child Contexts.
 	 */
-	boolean inherited();
+	boolean isInherited();
 
 	/**
 	 * The root Context of this scope.
 	 */
-	Context rootContext();
+	Context getRootContext();
 
 	/**
 	 * The registry for receivers of application messages dispatched through this scope.
 	 */
-	MessageReceiverRegistry messageReceivers();
+	MessageReceiverRegistry getMessageReceivers();
 
 	/**
 	 * Returns the cache of message receivers for the specified message type.
@@ -50,7 +50,7 @@ public interface ScopeInfo {
 	/**
 	 * The manager for active commands in this scope.
 	 */
-	CommandManager commandManager();
+	CommandManager getCommandManager();
 
 	/**
 	 * Adds an active command to the command manager of this scope.

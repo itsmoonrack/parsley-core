@@ -12,17 +12,17 @@ public interface CommandObserverProcessor extends MessageProcessor {
 	/**
 	 * The actual command instance.
 	 */
-	Object command();
+	Object getCommand();
 
 	/**
 	 * The result produced by the command.
 	 */
-	Object result();
+	Object getResult();
 
 	/**
 	 * The status of the command.
 	 */
-	CommandStatus commandStatus();
+	CommandStatus getCommandStatus();
 
 	/**
 	 * Indicates whether this processor handles a root command or a nested command.
@@ -30,7 +30,7 @@ public interface CommandObserverProcessor extends MessageProcessor {
 	 * This property is true if the command is a simple stand-alone command or the root command of a sequence or flow. It is flow if it is a
 	 * command nested in a sequence or flow.
 	 */
-	boolean root();
+	boolean isRoot();
 
 	/**
 	 * Changes the result that the command produced.

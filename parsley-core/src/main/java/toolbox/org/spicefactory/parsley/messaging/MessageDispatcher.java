@@ -43,7 +43,7 @@ class MessageDispatcher implements Dispatcher {
 			logger.warn("Attempt to use message dispatcher for {} after it has been disabled.", owner);
 			return;
 		}
-		if (scope == Scope.GLOBAL) {
+		if (scope.equals(Scope.GLOBAL)) {
 			scopeManager.dispatchMessage(message, selector);
 		} else {
 			scopeManager.getScope(scope).dispatchMessage(message, selector);
