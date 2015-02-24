@@ -22,13 +22,22 @@ import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
  * Default implementation of MessageProcessor interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-class DefaultMessageProcessor implements MessageProcessor {
+class DefaultMessageProcessor implements MessageProcessor<Object> {
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	protected final Message<?> message;
+	protected final MessageReceiverCache cache;
+
+	private Processor currentProcessor;
+	private List<Processor> remainingProcessors;
+	private MessageState state;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	DefaultMessageProcessor(Message message, MessageReceiverCache cache, MessageSettings settings) {
+	DefaultMessageProcessor(Message<?> message, MessageReceiverCache cache, MessageSettings settings) {
 		this.cache = cache;
 		this.message = message;
 	}
@@ -106,15 +115,6 @@ class DefaultMessageProcessor implements MessageProcessor {
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	private Processor currentProcessor;
-	private List<Processor> remainingProcessors;
-	private MessageState state;
-
-	protected final Message message;
-	protected final MessageReceiverCache cache;
-
 	private void createProcessors() {
 		currentProcessor = new Processor(fetchReceivers());
 		remainingProcessors = new ArrayList<Processor>();
@@ -133,7 +133,7 @@ class DefaultMessageProcessor implements MessageProcessor {
 	}
 
 	protected String getTraceString(String status, int receiverCount) {
-		return MessageFormat.format("{0} message {1} with {2} receiver(s).", status, message.type(), receiverCount);
+		return MessageFormat.format("{0} message {1} with {2} receiver(s).", status, message.getType(), receiverCount);
 	}
 
 	/**

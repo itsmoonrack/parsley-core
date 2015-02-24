@@ -131,7 +131,7 @@ public class DefaultScopeManager implements ScopeManager {
 		if (selector == Selector.NONE) {
 			selector = cache.getSelectorValue(message);
 		}
-		final Message instance = new DefaultMessage(message, type, selector);
+		final Message<Object> instance = new DefaultMessage(message, type, selector);
 
 		if (cache.getReceivers(MessageReceiverKind.TARGET, selector).size() == 0) {
 			logger.warn("Discarding message '{}': no matching receiver in any scope.", type.getName());
@@ -147,7 +147,7 @@ public class DefaultScopeManager implements ScopeManager {
 		final List<MessageReceiverCache> triggerCaches = new ArrayList<MessageReceiverCache>();
 		for (ScopeInfo scope : scopeInfoRegistry.getActiveScopes()) {
 			if (command.getTrigger() != null) {
-				triggerCaches.add(scope.getMessageReceiverCache(command.getTrigger().type()));
+				triggerCaches.add(scope.getMessageReceiverCache(command.getTrigger().getType()));
 			}
 			typeCaches.add(scope.getMessageReceiverCache(command.getType()));
 			scope.addActiveCommand(command);
@@ -185,8 +185,8 @@ public class DefaultScopeManager implements ScopeManager {
 
 		private boolean hasReceivers(ObservableCommand command) {
 			if (command.getTrigger() != null
-					&& triggerCache.getReceivers(MessageReceiverKind.forCommandStatus(command.getStatus(), true), command.getTrigger().getSelector())
-							.size() > 0) {
+					&& triggerCache.getReceivers(MessageReceiverKind.forCommandStatus(command.getStatus(), true),
+							command.getTrigger().getSelector()).size() > 0) {
 				return true;
 			}
 			return typeCache.getReceivers(MessageReceiverKind.forCommandStatus(command.getStatus(), false), command.getId()).size() > 0;

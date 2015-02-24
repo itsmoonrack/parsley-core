@@ -1,15 +1,11 @@
 package org.spicefactory.parsley.messaging.model;
 
-import javax.inject.Singleton;
-
 import org.spicefactory.lib.event.Event;
-import org.spicefactory.parsley.messaging.annotation.MessageHandler;
 import org.spicefactory.parsley.messaging.messages.TestEvent;
 
 /**
  * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
  */
-@Singleton
 public class MessageHandlers {
 
 	public int genericEventCount = 0, test1Count = 0, test2Count = 0;
@@ -19,7 +15,6 @@ public class MessageHandlers {
 
 	public String order = "";
 
-	@MessageHandler(order = 3)
 	public void allTestEvents(TestEvent event) {
 		order += "T";
 		if (event.getID() == TestEvent.TEST1) {
@@ -31,13 +26,11 @@ public class MessageHandlers {
 		}
 	}
 
-	@MessageHandler(order = 2)
 	public void allEvents(Event event) {
 		order += "A";
 		genericEventCount++;
 	}
 
-	@MessageHandler(order = 1, selector = TestEvent.TEST1)
 	public void event1(TestEvent event) {
 		order += "1";
 		if (event.getID() == TestEvent.TEST1) {
@@ -47,7 +40,6 @@ public class MessageHandlers {
 		}
 	}
 
-	@MessageHandler(order = 1, selector = TestEvent.TEST2)
 	public void event2(TestEvent event) {
 		order += "2";
 		if (event.getID() == TestEvent.TEST2) {
@@ -57,7 +49,6 @@ public class MessageHandlers {
 		}
 	}
 
-	@MessageHandler(type = TestEvent.class, messagesProperties = {"stringProp", "intProp"})
 	public void mappedProperties(String stringProp, int intProp) {
 		this.stringProp = stringProp;
 		this.intProp = intProp;

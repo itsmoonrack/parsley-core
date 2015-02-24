@@ -1,21 +1,20 @@
 package org.spicefactory.parsley.core.messaging;
 
-
 /**
  * Represents a single message and all its relevant settings.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public interface Message {
+public interface Message<T> {
 
 	/**
 	 * Returns actual message instance.
 	 */
-	Object getInstance();
+	T getInstance();
 
 	/**
 	 * Returns type of the message.
 	 */
-	Class<?> type();
+	Class<? extends T> getType();
 
 	/**
 	 * Returns selector to use to determine matching receivers.

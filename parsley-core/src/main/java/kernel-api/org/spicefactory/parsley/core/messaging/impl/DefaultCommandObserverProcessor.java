@@ -96,7 +96,7 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 
 	@Override
 	protected String getTraceString(String status, int receiverCount) {
-		return MessageFormat.format("{0} message '{1}' for command status '{2}' to {3} observer(s).", status, message.type(),
+		return MessageFormat.format("{0} message '{1}' for command status '{2}' to {3} observer(s).", status, message.getType(),
 				getCommandStatus(), receiverCount);
 	}
 

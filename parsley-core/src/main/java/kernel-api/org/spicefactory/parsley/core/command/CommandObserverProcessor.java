@@ -7,7 +7,7 @@ import org.spicefactory.parsley.core.messaging.MessageProcessor;
  * later resume the message processing.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public interface CommandObserverProcessor extends MessageProcessor {
+public interface CommandObserverProcessor extends MessageProcessor<Object> {
 
 	/**
 	 * The actual command instance.

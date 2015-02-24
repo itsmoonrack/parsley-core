@@ -3,9 +3,13 @@ package org.spicefactory.parsley.core.context;
 import javax.annotation.Nullable;
 
 import org.spicefactory.lib.event.IEventDispatcher;
+import org.spicefactory.lib.event.annotation.Event;
+import org.spicefactory.lib.event.annotation.Events;
+import org.spicefactory.parsley.core.events.ContextEvent;
 import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.core.view.ViewManager;
 
+@Events({
 /**
  * Dispatched when configuration for this Context has been fully processed.
  * <p>
@@ -16,7 +20,7 @@ import org.spicefactory.parsley.core.view.ViewManager;
  * should check the <code>isConfigured</code> method on the Context.
  * </p>
  */
-// @Event(id = ContextEvent.CONFIGURED, type = ContextEvent.class)
+@Event(type = ContextEvent.class, id = ContextEvent.CONFIGURED),
 
 /**
  * Dispatched when the Context was fully initialized.
@@ -28,7 +32,7 @@ import org.spicefactory.parsley.core.view.ViewManager;
  * should check the <code>isInitialized</code> method on the Context.
  * </p>
  */
-// @Event(id = ContextEvent.INITIALIZED, type = ContextEvent.class)
+@Event(type = ContextEvent.class, id = ContextEvent.INITIALIZED),
 
 /**
  * Dispatched when Context initialization failed.
@@ -40,7 +44,7 @@ import org.spicefactory.parsley.core.view.ViewManager;
  * never fire. In particular it does not fire if retrieving a lazy initializing object fails after Context initialization.
  * </p>
  */
-// @Event(id = ContextEvent.ERROR, type = ContextEvent.class)
+@Event(type = ContextEvent.class, id = ContextEvent.ERROR),
 
 /**
  * Dispatched when the Context was destroyed.
@@ -48,7 +52,7 @@ import org.spicefactory.parsley.core.view.ViewManager;
  * At this point all methods marked with @Destroy on objects managed by this context have been invoked and any child Context instances were
  * destroyed, too.
  */
-// Event(id = ContextEvent.DESTROYED, type = ContextEvent.class)
+@Event(type = ContextEvent.class, id = ContextEvent.DESTROYED)})
 
 /**
  * The main interface of the IoC Container providing access to all configured objects.

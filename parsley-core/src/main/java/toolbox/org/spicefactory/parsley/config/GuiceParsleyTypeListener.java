@@ -8,7 +8,9 @@ import javax.inject.Singleton;
 import org.spicefactory.parsley.comobserver.annotation.CommandResult;
 import org.spicefactory.parsley.comobserver.receiver.GuiceCommandResultInjectionListener;
 import org.spicefactory.parsley.core.scope.ScopeManager;
+import org.spicefactory.parsley.messaging.GuiceManagedEventsInjectionListener;
 import org.spicefactory.parsley.messaging.GuiceMessageDispatcherMembersInjector;
+import org.spicefactory.parsley.messaging.annotation.ManagedEvents;
 import org.spicefactory.parsley.messaging.annotation.MessageDispatcher;
 import org.spicefactory.parsley.messaging.annotation.MessageHandler;
 import org.spicefactory.parsley.messaging.annotation.MessageHandlers;
@@ -24,6 +26,12 @@ public class GuiceParsleyTypeListener implements TypeListener {
 	@Override
 	public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
 		Class<? super I> c = type.getRawType();
+
+		// Registers an injection listener on events managed by this class
+		// so Parsley central router can dispatch them through framework.
+		if (type.getRawType().isAnnotationPresent(ManagedEvents.class)) {
+			encounter.register(new GuiceManagedEventsInjectionListener(encounter.getProvider(ScopeManager.class), type.getRawType()));
+		}
 
 		while (c.getSuperclass() != null) {
 			// Registers a members injector for a Dispatcher fields annotated with

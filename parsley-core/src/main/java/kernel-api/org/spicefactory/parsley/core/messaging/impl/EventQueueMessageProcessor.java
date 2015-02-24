@@ -14,7 +14,7 @@ class EventQueueMessageProcessor extends DefaultMessageProcessor {
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	EventQueueMessageProcessor(Message message, MessageReceiverCache cache, MessageSettings settings) {
+	EventQueueMessageProcessor(Message<?> message, MessageReceiverCache cache, MessageSettings settings) {
 		super(message, cache, settings);
 	}
 

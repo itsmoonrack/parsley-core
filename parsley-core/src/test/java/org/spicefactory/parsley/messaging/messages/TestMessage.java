@@ -12,4 +12,9 @@ public class TestMessage {
 
 	public int value;
 
+	public TestMessage(int name, int value) {
+		this.name = name;
+		this.value = value;
+	}
+
 }

@@ -7,7 +7,7 @@ import org.spicefactory.parsley.core.messaging.Selector;
  * Default implementation of the Message interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public final class DefaultMessage implements Message {
+public final class DefaultMessage implements Message<Object> {
 
 	private final Object instance;
 	private final Class<?> type;
@@ -29,7 +29,7 @@ public final class DefaultMessage implements Message {
 	}
 
 	@Override
-	public Class<?> type() {
+	public Class<?> getType() {
 		return type;
 	}
 

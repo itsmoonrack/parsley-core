@@ -7,12 +7,12 @@ import javax.annotation.Nullable;
  * suspend and later resume the message processing.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-public interface MessageProcessor {
+public interface MessageProcessor<T> {
 
 	/**
 	 * Returns the message instance.
 	 */
-	Message getMessage();
+	Message<T> getMessage();
 
 	/**
 	 * Returns the current state of this processor.
