@@ -80,13 +80,13 @@ public class DefaultContext extends EventDispatcher<ContextListener, ContextEven
 	@Override
 	public boolean isConfigured() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isInitialized() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

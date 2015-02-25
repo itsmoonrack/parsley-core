@@ -12,8 +12,10 @@ import org.spicefactory.parsley.messaging.GuiceManagedEventsInjectionListener;
 import org.spicefactory.parsley.messaging.GuiceMessageDispatcherMembersInjector;
 import org.spicefactory.parsley.messaging.annotation.ManagedEvents;
 import org.spicefactory.parsley.messaging.annotation.MessageDispatcher;
+import org.spicefactory.parsley.messaging.annotation.MessageException;
 import org.spicefactory.parsley.messaging.annotation.MessageHandler;
 import org.spicefactory.parsley.messaging.annotation.MessageHandlers;
+import org.spicefactory.parsley.messaging.receiver.GuiceMessageExceptionInjectionListener;
 import org.spicefactory.parsley.messaging.receiver.GuiceMessageReceiverInjectionListener;
 import org.spicefactory.parsley.messaging.receiver.GuiceMessagesReceiverInjectionListener;
 
@@ -45,6 +47,9 @@ public class GuiceParsleyTypeListener implements TypeListener {
 			// so MessageRouter can dispatch messages to this singleton instance.
 			if (type.getRawType().isAnnotationPresent(Singleton.class)) {
 				for (Method method : c.getDeclaredMethods()) {
+					if (method.isAnnotationPresent(MessageException.class)) {
+						encounter.register(new GuiceMessageExceptionInjectionListener(encounter.getProvider(ScopeManager.class), method));
+					}
 					if (method.isAnnotationPresent(MessageHandler.class)) {
 						encounter.register(new GuiceMessageReceiverInjectionListener(encounter.getProvider(ScopeManager.class), method));
 					}

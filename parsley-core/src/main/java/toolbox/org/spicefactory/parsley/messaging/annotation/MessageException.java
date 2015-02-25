@@ -7,6 +7,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.spicefactory.parsley.core.messaging.Selector;
+import org.spicefactory.parsley.core.scope.Scope;
+
 /**
  * Parsley allows to configure a method to be invoked whenever a handler for a matching message threw an Exception:
  * <p>
@@ -40,5 +43,36 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 @Retention(RUNTIME)
 public @interface MessageException {
+
+	/**
+	 * The name of the scope this tag should be applied to.
+	 */
+	String scope() default Scope.GLOBAL;
+
+	/**
+	 * The type of the messages the receiver wants to handle.
+	 */
+	Class<?> type() default Object.class;
+
+	/**
+	 * An optional selector value to be used in addition to selecting messages by type. Will be checked against the value of the property in the
+	 * message annotated with <code>@Selector</code>.
+	 */
+	int selector() default Selector.NONE;
+
+	/**
+	 * The execution order for this receiver. Will be processed in ascending order.
+	 * <p>
+	 * The default is <code>int.MAX_VALUE</code>.
+	 * </p>
+	 */
+	int order() default Integer.MAX_VALUE;
+
+	/**
+	 * The type of the exception that this handler is interested in.
+	 * <p>
+	 * The default is the top level Throwable class.
+	 */
+	Class<Throwable> exceptionType() default Throwable.class;
 
 }

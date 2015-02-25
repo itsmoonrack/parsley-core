@@ -59,7 +59,7 @@ class DefaultMessageReceiverCache implements MessageReceiverCache, CollectionLis
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public List<MessageReceiver> getReceivers(MessageReceiverKind kind, int selector) {
+	public List<MessageReceiver> getReceivers(MessageReceiverKind kind, Object selector) {
 		return getSelectorMap(kind).getReceivers(selector, messageType.getClassLoader());
 	}
 

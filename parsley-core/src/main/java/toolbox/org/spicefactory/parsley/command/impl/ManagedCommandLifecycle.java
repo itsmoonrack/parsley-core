@@ -135,7 +135,7 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 
 		public void setResult(CommandResult result) {
 			this.status =
-					(result.complete() ? CommandStatus.COMPLETE : (result.getValue() == null ? CommandStatus.CANCEL : CommandStatus.ERROR));
+					(result.complete() ? CommandStatus.COMPLETE : (result.getValue() == null ? CommandStatus.CANCEL : CommandStatus.EXCEPTION));
 			this.result = result.getValue();
 			for (CommandObserver callback : callbacks) {
 				callback.handleCommand(this);

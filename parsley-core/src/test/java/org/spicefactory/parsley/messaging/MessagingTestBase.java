@@ -10,6 +10,7 @@ import org.spicefactory.lib.event.Event;
 import org.spicefactory.parsley.core.context.Context;
 import org.spicefactory.parsley.messaging.messages.TestEvent;
 import org.spicefactory.parsley.messaging.messages.TestMessage;
+import org.spicefactory.parsley.messaging.model.ExceptionHandlers;
 import org.spicefactory.parsley.messaging.model.EventSource;
 import org.spicefactory.parsley.messaging.model.FaultyMessageHandlers;
 import org.spicefactory.parsley.messaging.model.MessageHandlers;
@@ -116,11 +117,22 @@ public abstract class MessagingTestBase {
 	}
 
 	@Test
-	public void testErrorHandlers() {
+	public void testExceptionHandlers() {
 		// Given
 		EventSource source = context.getInstance(EventSource.class);
 		context.getInstance(FaultyMessageHandlers.class); // must fetch explicitly - it's lazy
+		ExceptionHandlers handlers = context.getInstance(ExceptionHandlers.class);
 
+		// When
+		source.dispatchEvent(new TestEvent(TestEvent.TEST1, "foo1", 7));
+		source.dispatchEvent(new TestEvent(TestEvent.TEST2, "foo2", 9));
+		source.dispatchEvent(new Event(0x00));
+
+		// Then
+		assertThat(handlers.getCount(), equalTo(15));
+		assertThat(handlers.getCount(TestEvent.class), equalTo(14));
+		assertThat(handlers.getCount(TestEvent.class, TestEvent.TEST1), equalTo(1));
+		assertThat(handlers.getCount(TestEvent.class, TestEvent.TEST2), equalTo(1));
 	}
 
 	@Test

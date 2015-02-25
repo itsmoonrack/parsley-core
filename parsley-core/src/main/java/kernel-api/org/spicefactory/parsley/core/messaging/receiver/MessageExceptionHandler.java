@@ -24,6 +24,6 @@ public interface MessageExceptionHandler extends MessageReceiver {
 	 * @param processor the processor for the message
 	 * @param exception the exception thrown by a message target
 	 */
-	void handleException(MessageProcessor processor, Throwable exception);
+	void handleException(MessageProcessor<?> processor, Throwable exception);
 
 }

@@ -95,8 +95,8 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, int selector) {
-		return (command.getTrigger() != null && messageType.isAssignableFrom(command.getTrigger().getInstance().getClass()) && (selector == Selector.NONE || selector == command
-				.getTrigger().getSelector()));
+	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, Object selector) {
+		return (command.getTrigger() != null && messageType.isAssignableFrom(command.getTrigger().getInstance().getClass()) && (selector
+				.equals(Selector.NONE) || selector.equals(command.getTrigger().getSelector())));
 	}
 }

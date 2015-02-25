@@ -203,7 +203,7 @@ public class DefaultScopeManager implements ScopeManager {
 		}
 
 		@Override
-		public List<MessageReceiver> getReceivers(MessageReceiverKind kind, int selector) {
+		public List<MessageReceiver> getReceivers(MessageReceiverKind kind, Object selector) {
 			List<MessageReceiver> receivers = new ArrayList<MessageReceiver>();
 			for (MessageReceiverCache cache : caches) {
 				receivers.addAll(cache.getReceivers(kind, selector));

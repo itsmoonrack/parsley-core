@@ -7,7 +7,7 @@ import org.spicefactory.parsley.core.messaging.MessageRouter;
 public class EventQueueMessageRouter extends DefaultMessageRouter implements MessageRouter {
 
 	@Override
-	public void dispatchMessage(Message message, MessageReceiverCache cache) {
+	public void dispatchMessage(Message<Object> message, MessageReceiverCache cache) {
 		EventQueueMessageProcessor processor = new EventQueueMessageProcessor(message, cache, settings);
 		processor.start();
 	}

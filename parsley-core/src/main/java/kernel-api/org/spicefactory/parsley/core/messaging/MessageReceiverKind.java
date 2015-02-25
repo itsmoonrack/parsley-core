@@ -14,9 +14,9 @@ public enum MessageReceiverKind {
 	TARGET,
 
 	/**
-	 * Constant for an error handler.
+	 * Constant for an exception handler.
 	 */
-	ERROR_HANDLER,
+	EXCEPTION_HANDLER,
 
 	/**
 	 * Constant for a command observer for the status EXECUTE, matching by trigger message and selector.
@@ -29,9 +29,9 @@ public enum MessageReceiverKind {
 	COMMAND_COMPLETE_BY_TRIGGER,
 
 	/**
-	 * Constant for a command observer for the status ERROR, matching by trigger message and selector.
+	 * Constant for a command observer for the status EXCEPTION, matching by trigger message and selector.
 	 */
-	COMMAND_ERROR_BY_TRIGGER,
+	COMMAND_EXCEPTION_BY_TRIGGER,
 
 	/**
 	 * Constant for a command observer for the status CANCEL, matching by trigger message and selector.
@@ -49,9 +49,9 @@ public enum MessageReceiverKind {
 	COMMAND_COMPLETE_BY_TYPE,
 
 	/**
-	 * Constant for a command observer for the status ERROR, matching by command type and id.
+	 * Constant for a command observer for the status EXCEPTION, matching by command type and id.
 	 */
-	COMMAND_ERROR_BY_TYPE,
+	COMMAND_EXCEPTION_BY_TYPE,
 
 	/**
 	 * Constant for a command observer for the status CANCEL, matching by command type and id.
@@ -66,8 +66,8 @@ public enum MessageReceiverKind {
 				return byTrigger ? COMMAND_COMPLETE_BY_TRIGGER : COMMAND_COMPLETE_BY_TYPE;
 			case CANCEL:
 				return byTrigger ? COMMAND_CANCEL_BY_TRIGGER : COMMAND_CANCEL_BY_TYPE;
-			case ERROR:
-				return byTrigger ? COMMAND_ERROR_BY_TRIGGER : COMMAND_ERROR_BY_TYPE;
+			case EXCEPTION:
+				return byTrigger ? COMMAND_EXCEPTION_BY_TRIGGER : COMMAND_EXCEPTION_BY_TYPE;
 			default:
 				return null;
 		}

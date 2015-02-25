@@ -17,9 +17,9 @@ public enum CommandStatus {
 	COMPLETE,
 
 	/**
-	 * The status for a command that finished with an error.
+	 * The status for a command that finished with an exception.
 	 */
-	ERROR,
+	EXCEPTION,
 
 	/**
 	 * The status for a command that was cancelled.

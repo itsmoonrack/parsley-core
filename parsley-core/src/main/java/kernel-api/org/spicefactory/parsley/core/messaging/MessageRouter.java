@@ -13,7 +13,7 @@ public interface MessageRouter {
 	 * @param message the message to dispatch
 	 * @param cache the cache of receivers for the message type
 	 */
-	void dispatchMessage(Message message, MessageReceiverCache cache);
+	void dispatchMessage(Message<Object> message, MessageReceiverCache cache);
 
 	/**
 	 * Processes the observers registered for the specified command and its current status.

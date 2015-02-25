@@ -15,6 +15,6 @@ public interface MessageTarget extends MessageReceiver {
 	 * The specified processor may be used to control the message processing, like canceling or suspending a message.
 	 * @param processor the processor for the message
 	 */
-	void handleMessage(MessageProcessor processor);
+	void handleMessage(MessageProcessor<Object> processor);
 
 }

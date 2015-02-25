@@ -1,5 +1,7 @@
 package org.spicefactory.parsley.core.messaging.impl;
 
+import static org.spicefactory.parsley.core.messaging.MessageReceiverKind.EXCEPTION_HANDLER;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -7,14 +9,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spicefactory.parsley.core.messaging.ExceptionPolicy;
 import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.MessageProcessor;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.MessageSettings;
 import org.spicefactory.parsley.core.messaging.MessageState;
+import org.spicefactory.parsley.core.messaging.receiver.MessageExceptionHandler;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
 import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
 
@@ -26,10 +32,13 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	protected final Message<?> message;
+	protected final Message<Object> message;
 	protected final MessageReceiverCache cache;
+	protected final MessageSettings settings;
+	protected final Handler receiverHandler;
 
 	private Processor currentProcessor;
+	private Throwable currentThrowable;
 	private List<Processor> remainingProcessors;
 	private MessageState state;
 
@@ -37,9 +46,15 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	DefaultMessageProcessor(Message<?> message, MessageReceiverCache cache, MessageSettings settings) {
+	DefaultMessageProcessor(Message<Object> message, MessageReceiverCache cache, MessageSettings settings) {
+		this(message, cache, settings, null);
+	}
+
+	DefaultMessageProcessor(Message<Object> message, MessageReceiverCache cache, MessageSettings settings, @Nullable Handler receiverHandler) {
 		this.cache = cache;
 		this.message = message;
+		this.settings = settings;
+		this.receiverHandler = receiverHandler != null ? receiverHandler : invokeTarget;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -55,7 +70,7 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 	}
 
 	@Override
-	public Message getMessage() {
+	public Message<Object> getMessage() {
 		return message;
 	}
 
@@ -116,7 +131,7 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 	/////////////////////////////////////////////////////////////////////////////
 
 	private void createProcessors() {
-		currentProcessor = new Processor(fetchReceivers());
+		currentProcessor = new Processor(fetchReceivers(), receiverHandler);
 		remainingProcessors = new ArrayList<Processor>();
 	}
 
@@ -126,10 +141,6 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 	 */
 	protected List<MessageReceiver> fetchReceivers() {
 		return cache.getReceivers(MessageReceiverKind.TARGET, message.getSelector());
-	}
-
-	protected void invokeReceiver(MessageReceiver target) {
-		((MessageTarget) target).handleMessage(this);
 	}
 
 	protected String getTraceString(String status, int receiverCount) {
@@ -164,13 +175,16 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 			try {
 				currentProcessor.proceed();
 			}
-			catch (Exception e) {
-				if (!currentProcessor.handleErrors || e instanceof MessageProcessorException) {
+			catch (Throwable e) {
+				if (!currentProcessor.handleExceptions || e.getCause() instanceof MessageProcessorException) {
 					// Avoid the risk of endless loops.
-					throw new RuntimeException(e);
+					throw new RuntimeException(e.getCause());
 				}
-				logger.warn("Message receiver {} threw Exception: {}", currentProcessor.currentReceiver(), e);
-				if (!handleException(e)) {
+				if (e.getCause() instanceof InvocationTargetException) {
+					e = e.getCause();
+				}
+				logger.warn("Message receiver {} threw Exception: {}", currentProcessor.currentReceiver(), e.getCause());
+				if (!handleException(e.getCause())) {
 					return;
 				}
 			}
@@ -187,26 +201,82 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 		return false;
 	}
 
-	private boolean handleException(Exception e) {
-		// TODO: Implement me.
-		return true;
+	private boolean handleException(Throwable e) {
+		List<MessageExceptionHandler> handlers = new ArrayList<MessageExceptionHandler>();
+		List<MessageReceiver> exceptionHandlers = message != null ? //
+				cache.getReceivers(EXCEPTION_HANDLER, message.getSelector()) : new ArrayList<MessageReceiver>();
+
+		for (MessageReceiver h : exceptionHandlers) {
+			MessageExceptionHandler exceptionHandler = (MessageExceptionHandler) h;
+			if (exceptionHandler.getExceptionType().isAssignableFrom(e.getClass())) {
+				handlers.add(exceptionHandler);
+			}
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Select {} out of {} exception handlers.", handlers.size(), exceptionHandlers.size());
+		}
+
+		if (handlers.size() > 0) {
+			currentThrowable = e;
+			remainingProcessors.add(0, currentProcessor);
+			currentProcessor = new Processor(handlers, invokeExceptionHandler, false);
+			return true;
+		} else {
+			return unhandledException(e);
+		}
+	}
+
+	private boolean unhandledException(Throwable e) {
+		if (settings.unhandledException() == ExceptionPolicy.RETHROW) {
+			throw new MessageProcessorException("Exception in message receiver", e);
+		} else if (settings.unhandledException() == ExceptionPolicy.ABORT) {
+			logger.info("Unhandled exception: abort message processor.");
+			return false;
+		} else {
+			logger.info("Unhandled exception: continue message processing.");
+			return true;
+		}
+	}
+
+	// Java 1.8 forward compatibility.
+	private final Handler invokeTarget = new Handler() {
+		@Override
+		public void proceed(MessageProcessor<Object> processor, MessageReceiver target) {
+			((MessageTarget) target).handleMessage(processor);
+		}
+	};
+
+	// Java 1.8 forward compatibility.
+	private final Handler invokeExceptionHandler = new Handler() {
+		@Override
+		public void proceed(MessageProcessor<Object> processor, MessageReceiver target) {
+			((MessageExceptionHandler) target).handleException(processor, currentThrowable);
+		}
+	};
+
+	// @FunctionalInterface
+	public static interface Handler {
+		void proceed(MessageProcessor<Object> processor, MessageReceiver receiver);
 	}
 
 	class Processor {
 
 		private volatile int currentIndex = 0;
 
-		private final List<MessageReceiver> receivers;
-		private final boolean handleErrors;
+		private final List<? extends MessageReceiver> receivers;
+		private final Handler handler;
+		private final boolean handleExceptions;
 
-		Processor(List<MessageReceiver> receivers) {
-			this(receivers, true);
+		Processor(List<? extends MessageReceiver> receivers, Handler handler) {
+			this(receivers, handler, true);
 		}
 
-		Processor(List<MessageReceiver> receivers, boolean handleErrors) {
+		Processor(List<? extends MessageReceiver> receivers, Handler handler, boolean handleExceptions) {
 			Collections.sort(receivers, new MessageSorter());
-			this.handleErrors = handleErrors;
+			this.handleExceptions = handleExceptions;
 			this.receivers = receivers;
+			this.handler = handler;
 		}
 
 		boolean hasNext() {
@@ -225,8 +295,8 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 			return hasNext() ? receivers.get(currentIndex) : null;
 		}
 
-		void proceed() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-			invokeReceiver(receivers.get(currentIndex++));
+		void proceed() {
+			handler.proceed(DefaultMessageProcessor.this, receivers.get(currentIndex++));
 		}
 	}
 
@@ -245,9 +315,8 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 	}
 
 	class MessageProcessorException extends RuntimeException {
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = 2595177901374008347L;
+		public MessageProcessorException(String message, Throwable cause) {
+			super(message, cause);
+		}
 	}
 }

@@ -60,12 +60,12 @@ public class DefaultMessageReceiverRegistry implements MessageReceiverRegistry {
 
 	@Override
 	public void addExceptionHandler(MessageExceptionHandler handler) {
-		addReceiver(MessageReceiverKind.ERROR_HANDLER, handler);
+		addReceiver(MessageReceiverKind.EXCEPTION_HANDLER, handler);
 	}
 
 	@Override
 	public void removeExceptionHandler(MessageExceptionHandler handler) {
-		removeReceiver(MessageReceiverKind.ERROR_HANDLER, handler);
+		removeReceiver(MessageReceiverKind.EXCEPTION_HANDLER, handler);
 	}
 
 	@Override

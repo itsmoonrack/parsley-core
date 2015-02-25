@@ -6,11 +6,13 @@ import java.util.List;
 import org.spicefactory.parsley.core.command.CommandObserverProcessor;
 import org.spicefactory.parsley.core.command.CommandStatus;
 import org.spicefactory.parsley.core.command.ObservableCommand;
+import org.spicefactory.parsley.core.messaging.MessageProcessor;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.MessageSettings;
 import org.spicefactory.parsley.core.messaging.receiver.CommandObserver;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
+import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
 
 class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements CommandObserverProcessor {
 
@@ -26,7 +28,7 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 
 	DefaultCommandObserverProcessor(ObservableCommand observable, MessageReceiverCache typeCache, MessageReceiverCache triggerCache,
 			MessageSettings settings) {
-		super(observable.getTrigger(), triggerCache, settings);
+		super(observable.getTrigger(), triggerCache, settings, invokeReceiver);
 
 		this.typeCache = typeCache;
 		this.observable = observable;
@@ -64,7 +66,7 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 			throw new IllegalStateException("Cannot set the result while command is still executing.");
 		}
 		this.result = result;
-		this.status = (error) ? CommandStatus.ERROR : CommandStatus.COMPLETE;
+		this.status = (error) ? CommandStatus.EXCEPTION : CommandStatus.COMPLETE;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -85,14 +87,22 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 		return receivers;
 	}
 
-	@Override
-	protected void invokeReceiver(MessageReceiver observer) {
-		CommandStatus oldStatus = getCommandStatus();
-		((CommandObserver) observer).observeCommand(this);
-		if (oldStatus != getCommandStatus() && oldStatus != CommandStatus.EXECUTE) {
-			rewind();
+	// Java 1.8 forward-compatibility.
+	private static final Handler invokeReceiver = new Handler() {
+		@Override
+		public void proceed(MessageProcessor<Object> processor, MessageReceiver receiver) {
+			invokeReceiver((DefaultCommandObserverProcessor) processor, (MessageTarget) receiver);
+		}
+	};
+
+	private static void invokeReceiver(DefaultCommandObserverProcessor processor, MessageTarget observer) {
+		CommandStatus oldStatus = processor.getCommandStatus();
+		((CommandObserver) observer).observeCommand(processor);
+		if (oldStatus != processor.getCommandStatus() && oldStatus != CommandStatus.EXECUTE) {
+			processor.rewind();
 		}
 	}
+
 
 	@Override
 	protected String getTraceString(String status, int receiverCount) {

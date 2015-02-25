@@ -9,19 +9,23 @@ import org.spicefactory.parsley.core.messaging.MessageSettings;
 public class DefaultMessageRouter implements MessageRouter {
 
 	// TODO: Add MessageSettings here.
-	MessageSettings settings = null;
+	MessageSettings settings = DefaultMessageSettings.class.getAnnotation(MessageSettings.class);
 
 	@Override
-	public void dispatchMessage(Message message, MessageReceiverCache cache) {
+	public void dispatchMessage(Message<Object> message, MessageReceiverCache cache) {
 		DefaultMessageProcessor processor = new DefaultMessageProcessor(message, cache, settings);
 		processor.start();
 	}
 
 	@Override
 	public void observeCommand(ObservableCommand command, MessageReceiverCache typeCache, MessageReceiverCache triggerCache) {
-		System.err.println("observerCommand: " + command);
 		DefaultCommandObserverProcessor processor = new DefaultCommandObserverProcessor(command, typeCache, triggerCache, settings);
 		processor.start();
+	}
+
+	@MessageSettings
+	class DefaultMessageSettings {
+		// Dummy class.
 	}
 
 }

@@ -19,6 +19,6 @@ public interface Message<T> {
 	/**
 	 * Returns selector to use to determine matching receivers.
 	 */
-	int getSelector();
+	Object getSelector();
 
 }

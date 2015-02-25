@@ -14,7 +14,7 @@ public interface ObservableCommand {
 	 * The message that triggered the command. This property is null when the command was started programmatically.
 	 */
 	@Nullable
-	Message getTrigger();
+	Message<Object> getTrigger();
 
 	/**
 	 * The actual command instance.

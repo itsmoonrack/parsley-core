@@ -125,7 +125,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 	}
 
 	@Override
-	public void handleMessage(MessageProcessor processor) {
+	public void handleMessage(MessageProcessor<Object> processor) {
 		try {
 			final List<Object> args = new ArrayList<Object>();
 			if (messageFields == null) {
@@ -161,7 +161,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 			targetMethod.invoke(objectProvider.get(), args.toArray());
 		}
 		catch (Exception e) {
-			throw new Error("Message type " + type + " cannot be processed.", e);
+			throw new RuntimeException(e);
 		}
 	}
 }
