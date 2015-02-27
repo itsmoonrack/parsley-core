@@ -4,10 +4,7 @@ import java.lang.reflect.Method;
 
 import javax.inject.Provider;
 
-import org.spicefactory.lib.command.Command;
-import org.spicefactory.lib.command.builder.CommandBuilder;
-import org.spicefactory.lib.command.builder.Commands;
-import org.spicefactory.lib.command.proxy.CommandProxy;
+import org.spicefactory.lib.command.builder.CommandProxyBuilder;
 import org.spicefactory.parsley.command.impl.CommandTriggerProvider;
 import org.spicefactory.parsley.command.impl.DefaultManagedCommandProxy;
 import org.spicefactory.parsley.command.impl.MappedCommandProxy;
@@ -34,7 +31,7 @@ public class MappedCommandBuilder implements ContextListener {
 	private final MessageReceiverInfo info = new MessageReceiverInfo();
 
 	private String scope = Scope.GLOBAL;
-	private Class<?> messageType;
+	private Class<?> messageType = Object.class;
 	private MessageTarget target;
 
 	private MappedCommandBuilder(ManagedCommandFactory factory) {
@@ -52,12 +49,12 @@ public class MappedCommandBuilder implements ContextListener {
 		return new MappedCommandBuilder(factory);
 	}
 
-	static MappedCommandBuilder forType(Class<?> type) {
-		return new MappedCommandBuilder(new Factory(type));
+	static <T> MappedCommandBuilder forType(Class<T> type) {
+		return new MappedCommandBuilder(new Factory<T>(type));
 	}
 
-	static MappedCommandBuilder forProvider(Provider<?> provider, Class<?> type) {
-		return new MappedCommandBuilder(new Factory(type, provider));
+	static <T> MappedCommandBuilder forProvider(Provider<T> provider, Class<? extends T> type) {
+		return new MappedCommandBuilder(new Factory<T>(type, provider));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -79,7 +76,7 @@ public class MappedCommandBuilder implements ContextListener {
 	 * @param selector the selector to use for matching messages.
 	 * @return this builder instance for method chaining
 	 */
-	public MappedCommandBuilder selector(int selector) {
+	public MappedCommandBuilder selector(Object selector) {
 		info.selector = selector;
 		return this;
 	}
@@ -113,7 +110,7 @@ public class MappedCommandBuilder implements ContextListener {
 	 */
 	public void register(Context context) {
 		if (factory instanceof Factory)
-			((Factory) factory).init(context);
+			((Factory<?>) factory).init(context);
 
 		info.type = (messageType == Object.class) ? deduceMessageType() : messageType;
 		target = new MappedCommandProxy(factory, context, info);
@@ -134,11 +131,11 @@ public class MappedCommandBuilder implements ContextListener {
 		event.getContext().getScopeManager().getScope(scope).getMessageReceivers().removeTarget(target);
 	}
 
-	private static class Factory implements ManagedCommandFactory {
+	private static class Factory<T> implements ManagedCommandFactory {
 
 		private Context context;
-		private Provider<?> provider;
-		private final Class<?> type;
+		private Provider<T> provider;
+		private final Class<? extends T> type;
 
 		/////////////////////////////////////////////////////////////////////////////
 		// Package-private.
@@ -148,11 +145,11 @@ public class MappedCommandBuilder implements ContextListener {
 		// Public API.
 		/////////////////////////////////////////////////////////////////////////////
 
-		public Factory(Class<?> type) {
+		public Factory(Class<T> type) {
 			this.type = type;
 		}
 
-		public Factory(Class<?> type, Provider<?> provider) {
+		public Factory(Class<? extends T> type, Provider<T> provider) {
 			this.type = type;
 			this.provider = provider;
 		}
@@ -162,7 +159,7 @@ public class MappedCommandBuilder implements ContextListener {
 		}
 
 		@Override
-		public Class<?> type() {
+		public Class<? extends T> type() {
 			return type;
 		}
 
@@ -214,56 +211,6 @@ public class MappedCommandBuilder implements ContextListener {
 		private Class<?> getFirstParameterType(Method m) {
 			return m.getParameterTypes().length > 0 ? m.getParameterTypes()[0] : null;
 		}
-	}
-
-	private static class CommandProxyBuilder implements CommandBuilder {
-
-		private final Object target;
-		private final DefaultManagedCommandProxy proxy;
-
-		public CommandProxyBuilder(Object target, DefaultManagedCommandProxy proxy) {
-			this.proxy = proxy;
-			this.target = target;
-		}
-
-		@Override
-		public CommandProxy execute() {
-			CommandProxy proxy = build();
-			proxy.execute();
-			return proxy;
-		}
-
-		@Override
-		public CommandProxy build() {
-			if (target instanceof Class<?>) {
-				proxy.setType((Class<?>) target);
-			} else {
-				proxy.setTarget(asCommand(target));
-			}
-			return proxy;
-		}
-
-		/**
-		 * Turns the specified instance into a command that can be executed by the proxy created by this builder. Legal parameters are any
-		 * instances that implement either <code>Command</code> or <code>CommandBuilder</code>, a <code>Class</code> reference that specifies the
-		 * type of the target command to create, or any other type in case an adapter is registered that knows how to turn the type into a
-		 * command.
-		 * @param the instance to turn into a command
-		 * @return the command created from the specified instance
-		 */
-		private Command asCommand(Object command) {
-			if (command instanceof Command) {
-				return (Command) command;
-			} else if (command instanceof CommandBuilder) {
-				return ((CommandBuilder) command).build();
-			} else if (command instanceof Class<?>) {
-				return Commands.create((Class<?>) command).build();
-			}
-			// TODO: else ....
-
-			return null;
-		}
-
 	}
 
 }

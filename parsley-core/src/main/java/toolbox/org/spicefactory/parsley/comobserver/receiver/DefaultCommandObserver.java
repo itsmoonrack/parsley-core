@@ -7,6 +7,8 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.spicefactory.lib.command.adapter.CommandAdapter;
+import org.spicefactory.lib.command.data.CommandData;
+import org.spicefactory.lib.command.events.CommandException;
 import org.spicefactory.parsley.core.command.CommandObserverProcessor;
 import org.spicefactory.parsley.core.errors.ContextError;
 import org.spicefactory.parsley.core.messaging.MessageProcessor;
@@ -91,8 +93,8 @@ public class DefaultCommandObserver extends AbstractMethodReceiver implements Co
 
 	@Override
 	public int getOrder() {
-		if (order != Integer.MAX_VALUE) {
-			return order;
+		if (info.order != Integer.MAX_VALUE) {
+			return info.order;
 		}
 		return isInterceptor ? Integer.MIN_VALUE + 1 : Integer.MAX_VALUE;
 	}
@@ -117,17 +119,18 @@ public class DefaultCommandObserver extends AbstractMethodReceiver implements Co
 				if (param.isAssignableFrom(MessageProcessor.class)) {
 					params.add(processor);
 				} else {
-					//				if (processor.getMessage().getSelector() instanceof Class) {
-					//					params.add(null);
-					//				}
-					params.add(processor.getMessage().getSelector());
+					if (processor.getMessage().getSelector() instanceof Class) {
+						params.add(null);
+					} else {
+						params.add(processor.getMessage().getSelector());
+					}
 					if (paramTypes.length == maxParams) {
 						params.add(processor);
 					}
 				}
 			}
 			targetMethod.setAccessible(true);
-			targetMethod.invoke(objectProvider.get(), params.toArray());
+			targetMethod.invoke(provider.get(), params.toArray());
 		}
 		catch (Exception e) {
 			throw new Error(e);
@@ -144,6 +147,29 @@ public class DefaultCommandObserver extends AbstractMethodReceiver implements Co
 	/////////////////////////////////////////////////////////////////////////////
 
 	private boolean addResult(List<Object> params, Object result) {
-		return true;
+		if (result == null) {
+			params.add(null);
+			return true;
+		}
+		Class<?> param = targetMethod.getParameterTypes()[0];
+		if (result instanceof CommandException) {
+			Throwable rootCause = ((CommandException) result).getCause();
+			if (param.isAssignableFrom(rootCause.getClass())) {
+				params.add(rootCause);
+				return true;
+			}
+		}
+		if (param.isAssignableFrom(result.getClass())) {
+			params.add(result);
+			return true;
+		}
+		if (result instanceof CommandData) {
+			result = ((CommandData) result).getObject(param);
+			if (result != null) {
+				params.add(result);
+				return true;
+			}
+		}
+		return false;
 	}
 }

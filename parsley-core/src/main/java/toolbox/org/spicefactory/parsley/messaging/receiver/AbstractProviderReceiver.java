@@ -15,7 +15,7 @@ public abstract class AbstractProviderReceiver extends AbstractMessageReceiver {
 	/**
 	 * Provider for target instances for this receiver.
 	 */
-	protected Provider<?> objectProvider;
+	protected Provider<?> provider;
 
 	/**
 	 * Creates a new instance.

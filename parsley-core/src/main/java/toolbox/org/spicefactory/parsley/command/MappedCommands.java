@@ -33,7 +33,7 @@ public class MappedCommands {
 	 * @param provider the provider for creating new command instances
 	 * @param type the type of command the factory creates
 	 */
-	public static MappedCommandBuilder provide(Provider<?> provider, Class<?> type) {
+	public static <T> MappedCommandBuilder provide(Provider<T> provider, Class<? extends T> type) {
 		return MappedCommandBuilder.forProvider(provider, type);
 	}
 

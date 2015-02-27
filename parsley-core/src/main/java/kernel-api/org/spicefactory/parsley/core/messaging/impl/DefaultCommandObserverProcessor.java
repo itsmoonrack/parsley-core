@@ -12,7 +12,6 @@ import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.MessageSettings;
 import org.spicefactory.parsley.core.messaging.receiver.CommandObserver;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
-import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
 
 class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements CommandObserverProcessor {
 
@@ -75,7 +74,6 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 
 	@Override
 	protected List<MessageReceiver> fetchReceivers() {
-		System.err.println("fetchReceivers for command status: " + getCommandStatus());
 		List<MessageReceiver> receivers =
 				typeCache.getReceivers(MessageReceiverKind.forCommandStatus(getCommandStatus(), false), observable.getId());
 
@@ -91,13 +89,13 @@ class DefaultCommandObserverProcessor extends DefaultMessageProcessor implements
 	private static final Handler invokeReceiver = new Handler() {
 		@Override
 		public void proceed(MessageProcessor<Object> processor, MessageReceiver receiver) {
-			invokeReceiver((DefaultCommandObserverProcessor) processor, (MessageTarget) receiver);
+			invokeReceiver((DefaultCommandObserverProcessor) processor, (CommandObserver) receiver);
 		}
 	};
 
-	private static void invokeReceiver(DefaultCommandObserverProcessor processor, MessageTarget observer) {
+	private static void invokeReceiver(DefaultCommandObserverProcessor processor, CommandObserver observer) {
 		CommandStatus oldStatus = processor.getCommandStatus();
-		((CommandObserver) observer).observeCommand(processor);
+		observer.observeCommand(processor);
 		if (oldStatus != processor.getCommandStatus() && oldStatus != CommandStatus.EXECUTE) {
 			processor.rewind();
 		}

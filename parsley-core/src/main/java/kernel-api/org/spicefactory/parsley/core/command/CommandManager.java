@@ -25,7 +25,7 @@ public interface CommandManager {
 	 * @param selector the selector of the message that triggered the commands
 	 * @return true if there is at least one matching command in this scope.
 	 */
-	boolean hasActiveCommandsForTrigger(Class<?> messageType, int selector);
+	boolean hasActiveCommandsForTrigger(Class<?> messageType, Object selector);
 
 	/**
 	 * Indicates whether this scope has any active commands that matches the specified command type.
@@ -55,7 +55,7 @@ public interface CommandManager {
 	 * @param selector the selector of the message that triggered the commands
 	 * @return all matching ObservableCommand instances.
 	 */
-	List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, int selector);
+	List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, Object selector);
 
 	/**
 	 * Returns all active commands of the specified type.

@@ -82,7 +82,7 @@ class DefaultMessageExceptionHandler extends AbstractMethodReceiver implements M
 	private void deduceSelector() {
 		Class<?>[] params = targetMethod.getParameterTypes();
 		if (params.length >= 3 && !MessageProcessor.class.isAssignableFrom(params[2])) {
-			selector = params[2];
+			info.selector = params[2];
 		}
 	}
 
@@ -141,7 +141,7 @@ class DefaultMessageExceptionHandler extends AbstractMethodReceiver implements M
 
 		try {
 			targetMethod.setAccessible(true);
-			targetMethod.invoke(objectProvider.get(), params.toArray());
+			targetMethod.invoke(provider.get(), params.toArray());
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

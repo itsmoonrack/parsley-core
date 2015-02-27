@@ -10,8 +10,20 @@ import org.spicefactory.parsley.core.scope.ScopeDefinition;
 import org.spicefactory.parsley.core.scope.ScopeInfo;
 import org.spicefactory.parsley.core.scope.ScopeInfoRegistry;
 
+/**
+ * Default implementation of the ScopeInfoRegistry interface.
+ * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
+ */
 @Singleton
 public class DefaultScopeInfoRegistry implements ScopeInfoRegistry {
+
+	private final List<ScopeDefinition> newScopes;
+	private final List<ScopeInfo> parentScopes;
+	private final List<ScopeInfo> activeScopes;
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Package-private.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Inject
 	DefaultScopeInfoRegistry(List<ScopeDefinition> newScopes, List<ScopeInfo> parentScopes) {
@@ -19,6 +31,10 @@ public class DefaultScopeInfoRegistry implements ScopeInfoRegistry {
 		this.parentScopes = parentScopes;
 		this.activeScopes = new ArrayList<ScopeInfo>();
 	}
+
+	/////////////////////////////////////////////////////////////////////////////
+	// Public API.
+	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public List<ScopeDefinition> getNewScopes() {
@@ -40,8 +56,8 @@ public class DefaultScopeInfoRegistry implements ScopeInfoRegistry {
 		activeScopes.add(info);
 	}
 
-	private final List<ScopeDefinition> newScopes;
-	private final List<ScopeInfo> parentScopes;
-	private final List<ScopeInfo> activeScopes;
+	/////////////////////////////////////////////////////////////////////////////
+	// Internal implementation.
+	/////////////////////////////////////////////////////////////////////////////
 
 }

@@ -5,8 +5,13 @@ import java.lang.reflect.Method;
 
 import javax.inject.Singleton;
 
+import org.spicefactory.parsley.comobserver.annotation.CommandException;
 import org.spicefactory.parsley.comobserver.annotation.CommandResult;
+import org.spicefactory.parsley.comobserver.annotation.CommandStatus;
+import org.spicefactory.parsley.comobserver.receiver.GuiceCommandExceptionInjectionListener;
 import org.spicefactory.parsley.comobserver.receiver.GuiceCommandResultInjectionListener;
+import org.spicefactory.parsley.comobserver.receiver.GuiceCommandStatusInjectionListener;
+import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.scope.ScopeManager;
 import org.spicefactory.parsley.messaging.GuiceManagedEventsInjectionListener;
 import org.spicefactory.parsley.messaging.GuiceMessageDispatcherMembersInjector;
@@ -56,8 +61,15 @@ public class GuiceParsleyTypeListener implements TypeListener {
 					if (method.isAnnotationPresent(MessageHandlers.class)) {
 						encounter.register(new GuiceMessagesReceiverInjectionListener(encounter.getProvider(ScopeManager.class), method));
 					}
+					if (method.isAnnotationPresent(CommandStatus.class)) {
+						encounter.register(new GuiceCommandStatusInjectionListener(encounter.getProvider(ScopeManager.class), encounter
+								.getProvider(CommandManager.class), method));
+					}
 					if (method.isAnnotationPresent(CommandResult.class)) {
 						encounter.register(new GuiceCommandResultInjectionListener(encounter.getProvider(ScopeManager.class), method));
+					}
+					if (method.isAnnotationPresent(CommandException.class)) {
+						encounter.register(new GuiceCommandExceptionInjectionListener(encounter.getProvider(ScopeManager.class), method));
 					}
 				}
 			}

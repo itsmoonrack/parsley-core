@@ -3,6 +3,9 @@ package org.spicefactory.parsley.core.command.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.inject.Singleton;
+
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.ObservableCommand;
 import org.spicefactory.parsley.core.command.ObservableCommand.CommandObserver;
@@ -12,6 +15,7 @@ import org.spicefactory.parsley.core.messaging.Selector;
  * Default implementation of the CommandManager interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
+@Singleton
 public class DefaultCommandManager implements CommandManager, CommandObserver {
 
 	private final List<ObservableCommand> commands = new ArrayList<ObservableCommand>();
@@ -44,7 +48,7 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	}
 
 	@Override
-	public boolean hasActiveCommandsForTrigger(Class<?> messageType, int selector) {
+	public boolean hasActiveCommandsForTrigger(Class<?> messageType, Object selector) {
 		for (ObservableCommand command : commands) {
 			if (matchesByTrigger(command, messageType, selector)) {
 				return true;
@@ -60,7 +64,11 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 
 	@Override
 	public boolean hasActiveCommandsOfType(Class<?> commandType, String id) {
-		// TODO Auto-generated method stub
+		for (ObservableCommand command : commands) {
+			if (matchesByType(command, commandType, id)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -70,7 +78,7 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	}
 
 	@Override
-	public List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, int selector) {
+	public List<ObservableCommand> getActiveCommandsByTrigger(Class<?> messageType, Object selector) {
 		List<ObservableCommand> result = new ArrayList<ObservableCommand>();
 		for (ObservableCommand command : commands) {
 			if (matchesByTrigger(command, messageType, selector)) {
@@ -87,8 +95,13 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 
 	@Override
 	public List<ObservableCommand> getActiveCommandsByType(Class<?> commandType, String id) {
-		// TODO Auto-generated method stub
-		return null;
+		List<ObservableCommand> result = new ArrayList<ObservableCommand>();
+		for (ObservableCommand command : commands) {
+			if (matchesByType(command, commandType, id)) {
+				result.add(command);
+			}
+		}
+		return result;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -98,5 +111,9 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, Object selector) {
 		return (command.getTrigger() != null && messageType.isAssignableFrom(command.getTrigger().getInstance().getClass()) && (selector
 				.equals(Selector.NONE) || selector.equals(command.getTrigger().getSelector())));
+	}
+
+	private boolean matchesByType(ObservableCommand command, Class<?> commandType, @Nullable String id) {
+		return commandType.isAssignableFrom(command.getCommand().getClass()) && (id == null || id.equals(command.getId()));
 	}
 }

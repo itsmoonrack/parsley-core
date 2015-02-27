@@ -50,14 +50,14 @@ public class DefaultScope implements Scope {
 	}
 
 	@Override
-	public void dispatchMessage(Object instance, int selector) {
+	public void dispatchMessage(Object instance, Object selector) {
 		final Class<?> type = instance.getClass();
 		final MessageReceiverCache cache = info.getMessageReceiverCache(type);
 
-		if (selector == Selector.NONE) {
+		if (selector.equals(Selector.NONE)) {
 			selector = cache.getSelectorValue(instance);
 		}
-		final Message message = new DefaultMessage(instance, type, selector);
+		final Message<Object> message = new DefaultMessage(instance, type, selector);
 
 		if (cache.getReceivers(MessageReceiverKind.TARGET, message.getSelector()).size() == 0) {
 			logger.warn("Discarding message '{}' for scope '{}': no matching receiver.", instance.getClass(), getName());

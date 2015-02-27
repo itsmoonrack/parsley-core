@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import org.spicefactory.lib.command.CommandResult;
 import org.spicefactory.lib.command.data.CommandData;
-import org.spicefactory.lib.command.lifecycle.CommandLifecycle;
+import org.spicefactory.lib.command.lifecycle.DefaultCommandLifecycle;
 import org.spicefactory.lib.command.proxy.CommandProxy;
 import org.spicefactory.parsley.core.command.CommandStatus;
 import org.spicefactory.parsley.core.command.ManagedCommandProxy;
@@ -22,10 +22,10 @@ import org.spicefactory.parsley.core.messaging.Message;
  * and passing them to the CommandManager.
  * @author Sylvain Lecoy <sylvain.lecoy@swissquote.ch>
  */
-public class ManagedCommandLifecycle implements CommandLifecycle {
+public class ManagedCommandLifecycle extends DefaultCommandLifecycle {
 
 	private final Context context;
-	private final Message trigger;
+	private final Message<Object> trigger;
 	private final Map<Object, DefaultObservableCommand> observables;
 
 	private boolean root = true;
@@ -39,7 +39,7 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 		this(context, root, null);
 	}
 
-	public ManagedCommandLifecycle(Context context, ManagedCommandProxy root, @Nullable Message trigger) {
+	public ManagedCommandLifecycle(Context context, ManagedCommandProxy root, @Nullable Message<Object> trigger) {
 		this.context = context;
 		this.trigger = trigger;
 		this.nextId = root.getID();
@@ -52,7 +52,9 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 
 	@Override
 	public <T> T createInstance(Class<T> type, CommandData data) {
-		return context.getInstance(type); // Data on constructor is not supported for commands.
+		T instance = super.createInstance(type, data);
+		context.injectMembers(instance);
+		return instance;
 	}
 
 	@Override
@@ -68,7 +70,6 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 	public void afterCompletion(Object command, CommandResult result) {
 		if (observables.containsKey(command)) {
 			observables.get(command).setResult(result);
-			observables.remove(command); // TODO: Check if this need to be removed actually...
 		}
 	}
 
@@ -81,7 +82,7 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 	}
 
 	private ObservableCommand createObservableCommand(Object command) {
-		DefaultObservableCommand observable = new DefaultObservableCommand(command, command.getClass(), nextId, root);
+		DefaultObservableCommand observable = new DefaultObservableCommand(command, command.getClass(), String.valueOf(nextId), root);
 		root = false;
 		nextId = -1;
 		observables.put(command, observable);
@@ -93,13 +94,13 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 		private final Object command;
 		private final Class<?> type;
 		private final boolean root;
-		private final int id;
+		private final String id;
 		private final List<CommandObserver> callbacks;
 
 		private Object result;
 		private CommandStatus status;
 
-		public DefaultObservableCommand(Object command, Class<?> type, int id, boolean root) {
+		public DefaultObservableCommand(Object command, Class<?> type, String id, boolean root) {
 			this.command = command;
 			this.type = type;
 			this.root = root;
@@ -109,7 +110,7 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 		}
 
 		@Override
-		public Message getTrigger() {
+		public Message<Object> getTrigger() {
 			return trigger;
 		}
 
@@ -119,7 +120,7 @@ public class ManagedCommandLifecycle implements CommandLifecycle {
 		}
 
 		@Override
-		public int getId() {
+		public String getId() {
 			return id;
 		}
 

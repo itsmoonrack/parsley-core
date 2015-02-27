@@ -90,10 +90,10 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 		final List<Field> resolved = new ArrayList<Field>(requiredParams);
 		for (String name : messageProperties) {
 			try {
-				resolved.add(type.getDeclaredField(name));
+				resolved.add(info.type.getDeclaredField(name));
 			}
 			catch (NoSuchFieldException e) {
-				throw new Error("Message type " + type + " does not contain a field with name " + name + ".", e);
+				throw new Error("Message type " + info.type + " does not contain a field with name " + name + ".", e);
 			}
 		}
 
@@ -158,7 +158,7 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 			}
 
 			targetMethod.setAccessible(true);
-			targetMethod.invoke(objectProvider.get(), args.toArray());
+			targetMethod.invoke(provider.get(), args.toArray());
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

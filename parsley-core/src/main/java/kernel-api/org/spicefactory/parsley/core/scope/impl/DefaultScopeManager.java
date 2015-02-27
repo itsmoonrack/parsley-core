@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -19,6 +20,7 @@ import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageReceiverKind;
 import org.spicefactory.parsley.core.messaging.MessageRouter;
+import org.spicefactory.parsley.core.messaging.MessageSettings;
 import org.spicefactory.parsley.core.messaging.Selector;
 import org.spicefactory.parsley.core.messaging.impl.DefaultMessage;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
@@ -38,6 +40,7 @@ public class DefaultScopeManager implements ScopeManager {
 	private final Logger logger = LoggerFactory.getLogger(DefaultScopeManager.class);
 
 	private final Map<String, Scope> scopes;
+	private final String defaultReceiverScope;
 	private final MessageRouter messageRouter;
 	private final CommandManager commandManager;
 	private final ScopeInfoRegistry scopeInfoRegistry;
@@ -47,13 +50,15 @@ public class DefaultScopeManager implements ScopeManager {
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Inject
-	DefaultScopeManager(ScopeInfoRegistry scopeInfoRegistry, MessageRouter messageRouter, CommandManager commandManager) {
+	DefaultScopeManager(ScopeInfoRegistry scopeInfoRegistry, MessageRouter messageRouter, CommandManager commandManager,
+			MessageSettings settings) {
 		this.scopes = new HashMap<String, Scope>();
 		this.messageRouter = messageRouter;
 		this.commandManager = commandManager;
 		this.scopeInfoRegistry = scopeInfoRegistry;
 
 		initScopes(null);
+		defaultReceiverScope = settings.defaultReceiverScope();
 	}
 
 	/**
@@ -103,7 +108,13 @@ public class DefaultScopeManager implements ScopeManager {
 	}
 
 	@Override
-	public Scope getScope(String name) {
+	public Scope getScope(@Nullable String name) {
+		if (name == null) {
+			name = defaultReceiverScope;
+		}
+		if (!hasScope(name)) {
+			throw new IllegalArgumentException("This router does not contain a scope with name " + name);
+		}
 		return scopes.get(name);
 	}
 
@@ -118,7 +129,7 @@ public class DefaultScopeManager implements ScopeManager {
 	}
 
 	@Override
-	public void dispatchMessage(Object message, int selector) {
+	public void dispatchMessage(Object message, Object selector) {
 		final Class<?> type = message.getClass();
 		final List<ScopeInfo> scopes = scopeInfoRegistry.getActiveScopes();
 		final List<MessageReceiverCache> caches = new ArrayList<MessageReceiverCache>(scopes.size());
@@ -128,7 +139,7 @@ public class DefaultScopeManager implements ScopeManager {
 		}
 		final MessageReceiverCache cache = new MergedMessageReceiverCache(caches);
 
-		if (selector == Selector.NONE) {
+		if (selector.equals(Selector.NONE)) {
 			selector = cache.getSelectorValue(message);
 		}
 		final Message<Object> instance = new DefaultMessage(message, type, selector);

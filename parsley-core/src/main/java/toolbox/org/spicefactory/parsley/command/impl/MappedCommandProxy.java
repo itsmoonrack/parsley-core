@@ -42,7 +42,7 @@ public class MappedCommandProxy extends AbstractMessageReceiver implements Messa
 	/////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void handleMessage(MessageProcessor processor) {
+	public void handleMessage(MessageProcessor<Object> processor) {
 		ManagedCommandProxy command = factory.newInstance();
 		DefaultCommandData data = new DefaultCommandData();
 		data.addValue(processor.getMessage().getInstance());

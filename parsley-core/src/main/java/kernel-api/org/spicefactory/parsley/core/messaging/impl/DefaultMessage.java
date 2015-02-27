@@ -11,13 +11,13 @@ public final class DefaultMessage implements Message<Object> {
 
 	private final Object instance;
 	private final Class<?> type;
-	private final int selector;
+	private final Object selector;
 
 	public DefaultMessage(Object instance, Class<?> type) {
 		this(instance, type, Selector.NONE);
 	}
 
-	public DefaultMessage(Object instance, Class<?> type, int selector) {
+	public DefaultMessage(Object instance, Class<?> type, Object selector) {
 		this.instance = instance;
 		this.type = type;
 		this.selector = selector;

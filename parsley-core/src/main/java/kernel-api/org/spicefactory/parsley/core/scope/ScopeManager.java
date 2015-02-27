@@ -52,7 +52,7 @@ public interface ScopeManager {
 	 * @param message the message to dispatch
 	 * @param selector the selector to use if it cannot be determined from the message instance itself
 	 */
-	void dispatchMessage(Object message, int selector);
+	void dispatchMessage(Object message, Object selector);
 
 	/**
 	 * Observes the specified command and dispatches messages to registered observers of all scopes managed by this instance when the state of

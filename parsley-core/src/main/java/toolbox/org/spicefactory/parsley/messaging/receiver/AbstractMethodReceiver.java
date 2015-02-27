@@ -32,8 +32,8 @@ public abstract class AbstractMethodReceiver extends AbstractProviderReceiver im
 
 	@Override
 	public void init(Provider<?> provider, Method method) {
-		objectProvider = provider;
-		targetMethod = method;
+		this.provider = provider;
+		this.targetMethod = method;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -50,11 +50,11 @@ public abstract class AbstractMethodReceiver extends AbstractProviderReceiver im
 	 */
 	protected void deduceMessageTypeFromParameter(Method method, int index) {
 		Class<?> param = method.getParameterTypes()[index];
-		if (type == Object.class) {
-			type = param;
-		} else if (!param.isAssignableFrom(type)) {
+		if (info.type == Object.class) {
+			info.type = param;
+		} else if (!param.isAssignableFrom(info.type)) {
 			throw new Error("Target " + method + ": Method parameter of type " + param.getClass() + " is not applicable to message type "
-					+ type.getClass());
+					+ info.type.getClass());
 		}
 	}
 }

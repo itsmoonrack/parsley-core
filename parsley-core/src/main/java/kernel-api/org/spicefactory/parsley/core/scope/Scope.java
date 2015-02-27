@@ -101,7 +101,7 @@ public interface Scope {
 	 * @param message the message to dispatch
 	 * @param selector the selector to use if it cannot be determined from the message instance itself
 	 */
-	void dispatchMessage(Object message, int selector);
+	void dispatchMessage(Object message, Object selector);
 
 	class GlobalScope implements Annotation, ScopeDefinition {
 

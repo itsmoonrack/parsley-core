@@ -9,11 +9,9 @@ import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
 public abstract class AbstractMessageReceiver implements MessageReceiver {
 
 	/**
-	 * The receiver configuration in three (mutable) model object.
+	 * The receiver configuration.
 	 */
-	protected Class<?> type;
-	protected Object selector;
-	protected int order;
+	protected final MessageReceiverInfo info;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.
@@ -24,24 +22,22 @@ public abstract class AbstractMessageReceiver implements MessageReceiver {
 	/////////////////////////////////////////////////////////////////////////////
 
 	public AbstractMessageReceiver(MessageReceiverInfo info) {
-		this.type = info.type;
-		this.selector = info.selector;
-		this.order = info.order;
+		this.info = info;
 	}
 
 	@Override
 	public Class<?> getType() {
-		return type;
+		return info.type;
 	}
 
 	@Override
 	public Object getSelector() {
-		return selector;
+		return info.selector;
 	}
 
 	@Override
 	public int getOrder() {
-		return order;
+		return info.order;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
