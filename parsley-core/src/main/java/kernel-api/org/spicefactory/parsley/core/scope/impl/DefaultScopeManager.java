@@ -191,6 +191,7 @@ public class DefaultScopeManager implements ScopeManager {
 				}
 				return;
 			}
+
 			messageRouter.observeCommand(command, typeCache, triggerCache);
 		}
 
@@ -200,6 +201,7 @@ public class DefaultScopeManager implements ScopeManager {
 							command.getTrigger().getSelector()).size() > 0) {
 				return true;
 			}
+
 			return typeCache.getReceivers(MessageReceiverKind.forCommandStatus(command.getStatus(), false), command.getId()).size() > 0;
 		}
 

@@ -36,8 +36,8 @@ public class GuiceParsleyTypeListener implements TypeListener {
 
 		// Registers an injection listener on events managed by this class
 		// so Parsley central router can dispatch them through framework.
-		if (type.getRawType().isAnnotationPresent(ManagedEvents.class)) {
-			encounter.register(new GuiceManagedEventsInjectionListener(encounter.getProvider(ScopeManager.class), type.getRawType()));
+		if (c.isAnnotationPresent(ManagedEvents.class)) {
+			encounter.register(new GuiceManagedEventsInjectionListener(encounter.getProvider(ScopeManager.class), c));
 		}
 
 		while (c.getSuperclass() != null) {

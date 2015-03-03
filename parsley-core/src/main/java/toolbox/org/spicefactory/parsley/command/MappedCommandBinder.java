@@ -3,10 +3,7 @@ package org.spicefactory.parsley.command;
 import javax.inject.Provider;
 
 import org.spicefactory.lib.command.builder.CommandBuilder;
-import org.spicefactory.parsley.command.annotation.MapCommand;
-import org.spicefactory.parsley.core.command.ManagedCommandFactory;
-import org.spicefactory.parsley.core.command.ManagedCommandProxy;
-import org.spicefactory.parsley.core.context.Context;
+import org.spicefactory.parsley.command.annotation.MappedCommand;
 
 public class MappedCommandBinder {
 
@@ -25,56 +22,62 @@ public class MappedCommandBinder {
 	 * @param command
 	 */
 	public static MappedCommandBuilder mapCommand(Class<?> command) {
-		MapCommand mapCommand = command.getAnnotation(MapCommand.class);
+		MappedCommand mapCommand = command.getAnnotation(MappedCommand.class);
 		if (mapCommand == null) {
 			throw new RuntimeException("Cannot map command '" + command.getSimpleName() + "'. @MapCommand annotation is missing.");
 		}
-		return MappedCommandBuilder.forType(command). //
-				messageType(mapCommand.messageType()). //
-				selector(mapCommand.selector()). //
-				order(mapCommand.order()). //
-				scope(mapCommand.scope());
+		return MappedCommandBuilder.forType(command) //
+				.messageType(mapCommand.value()) //
+				.selector(mapCommand.selector()) //
+				.order(mapCommand.order()) //
+				.scope(mapCommand.scope());
 	}
 
 	/**
 	 * Binds a command factory to a message, using just-in-time binding.
 	 */
-	public static MappedCommandBuilder mapCommand(Class<?> messageType, CommandBuilder target, Provider<Context> provider) {
-		MapCommand mapCommand = DummyCommand.class.getAnnotation(MapCommand.class);
-		return MappedCommandBuilder.forFactory(new Factory(provider, ManagedCommands.wrap(target))). //
-				messageType(messageType). //
-				selector(mapCommand.selector()). //
-				order(mapCommand.order()). //
-				scope(mapCommand.scope());
+	public static MappedCommandBuilder mapCommand(Class<?> messageType, CommandBuilder target) {
+		MappedCommand mapCommand = DummyCommand.class.getAnnotation(MappedCommand.class);
+		return mapCommand(messageType, target, mapCommand.scope(), mapCommand.selector(), mapCommand.order());
+	}
+
+	/**
+	 * Binds a command factory to a message, using just-in-time binding.
+	 */
+	public static MappedCommandBuilder mapCommand(Class<?> messageType, CommandBuilder target, String scope) {
+		MappedCommand mapCommand = DummyCommand.class.getAnnotation(MappedCommand.class);
+		return mapCommand(messageType, target, scope, mapCommand.selector(), mapCommand.order());
+	}
+
+	/**
+	 * Binds a command factory to a message, using just-in-time binding.
+	 */
+	public static MappedCommandBuilder mapCommand(Class<?> messageType, CommandBuilder target, String scope, Object selector) {
+		MappedCommand mapCommand = DummyCommand.class.getAnnotation(MappedCommand.class);
+		return mapCommand(messageType, target, scope, selector, mapCommand.order());
+	}
+
+	/**
+	 * Binds a command factory to a message, using just-in-time binding.
+	 */
+	public static MappedCommandBuilder mapCommand(Class<?> messageType, final CommandBuilder target, String scope, Object selector, int order) {
+		return MappedCommandBuilder.forProvider(new Provider<CommandBuilder>() {
+			@Override
+			public CommandBuilder get() {
+				return target;
+			}
+		}, CommandBuilder.class) //
+				.messageType(messageType) //
+				.selector(selector) //
+				.order(order) //
+				.scope(scope);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Internal implementation.
 	/////////////////////////////////////////////////////////////////////////////
 
-	private static class Factory implements ManagedCommandFactory {
-
-		private final Provider<Context> provider;
-		private final ManagedCommandBuilder builder;
-
-		public Factory(Provider<Context> provider, ManagedCommandBuilder builder) {
-			this.provider = provider;
-			this.builder = builder;
-		}
-
-		@Override
-		public Class<?> type() {
-			return null;
-		}
-
-		@Override
-		public ManagedCommandProxy newInstance() {
-			return builder.build(provider.get());
-		}
-
-	}
-
-	@MapCommand
+	@MappedCommand
 	private static class DummyCommand {
 		// Used to get annotation defaults.
 	}

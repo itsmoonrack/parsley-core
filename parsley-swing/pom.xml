@@ -12,6 +12,29 @@
 			<groupId>org.spicefactory.parsley</groupId>
 			<artifactId>parsley-core</artifactId>
 		</dependency>
+		
+		<!-- Tests framework. -->
+        <dependency>
+            <groupId>org.spicefactory.parsley</groupId>
+            <artifactId>parsley-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 	</dependencies>
 	<name>Parsley Swing Integration</name>
 </project>

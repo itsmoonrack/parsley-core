@@ -1,4 +1,4 @@
-package org.spicefactory.parsley.core.messaging.impl;
+package org.spicefactory.parsley.swing.messaging;
 
 import java.awt.EventQueue;
 
@@ -6,11 +6,11 @@ import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.MessageProcessor;
 import org.spicefactory.parsley.core.messaging.MessageReceiverCache;
 import org.spicefactory.parsley.core.messaging.MessageSettings;
+import org.spicefactory.parsley.core.messaging.impl.DefaultMessageProcessor;
 import org.spicefactory.parsley.core.messaging.receiver.MessageReceiver;
 import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
 
 class EventQueueMessageProcessor extends DefaultMessageProcessor {
-
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Package-private.

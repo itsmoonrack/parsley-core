@@ -9,7 +9,7 @@ import org.spicefactory.parsley.core.messaging.MessageSettings;
 public class DefaultMessageRouter implements MessageRouter {
 
 	// TODO: Add MessageSettings here.
-	MessageSettings settings = DefaultMessageSettings.class.getAnnotation(MessageSettings.class);
+	protected MessageSettings settings = DefaultMessageSettings.class.getAnnotation(MessageSettings.class);
 
 	@Override
 	public void dispatchMessage(Message<Object> message, MessageReceiverCache cache) {

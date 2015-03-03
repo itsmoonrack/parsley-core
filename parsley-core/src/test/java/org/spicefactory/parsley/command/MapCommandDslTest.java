@@ -110,7 +110,7 @@ public class MapCommandDslTest extends MapCommandTestBase {
 
 	}
 
-	private Context buildContext() {
+	protected Context buildContext() {
 		Context context =
 				Guice.createInjector(Stage.DEVELOPMENT, new GuiceParsleyConfig(), new CommandObserverAnnotationConfig()).getInstance(Context.class);
 		setContext(context);

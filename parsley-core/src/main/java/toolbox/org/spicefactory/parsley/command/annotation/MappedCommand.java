@@ -27,7 +27,7 @@ import org.spicefactory.parsley.core.scope.Scope;
 @Documented
 @Target(TYPE)
 @Retention(RUNTIME)
-public @interface MapCommand {
+public @interface MappedCommand {
 
 	/**
 	 * The name of the scope in which to listen for messages.
@@ -37,17 +37,12 @@ public @interface MapCommand {
 	/**
 	 * The type of message (including sub-types) that should trigger command execution.
 	 */
-	Class<?> messageType() default Object.class;
+	Class<?> value() default Object.class;
 
 	/**
 	 * The optional selector for mapping matching messages.
 	 */
 	int selector() default Selector.NONE;
-
-	/**
-	 * When a command is asynchronous, the execute method is generally called in a background thread, depending on the implementation.
-	 */
-	boolean async() default false;
 
 	/**
 	 * The execution order in relation to other message receivers.

@@ -25,6 +25,7 @@ public abstract class CommandFactoryTestBase extends CommandTestBase {
 			return new ArrayList<ObservableCommand>(); // We do not test this scenario with factories.
 		return manager.getActiveCommandsByType(CommandBase.class);
 	}
+
 	@Override
 	protected void execute() {
 		proxy.execute();

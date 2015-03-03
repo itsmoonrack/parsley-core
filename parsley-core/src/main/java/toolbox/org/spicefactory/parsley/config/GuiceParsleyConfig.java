@@ -21,7 +21,6 @@ import org.spicefactory.parsley.core.view.ViewSettings;
 import org.spicefactory.parsley.view.FastInject;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Binder;
 import com.google.inject.Provides;
 
 @ViewSettings
@@ -78,8 +77,8 @@ public final class GuiceParsleyConfig extends AbstractModule {
 	/**
 	 * Binds a command factory to a message, using just-in-time binding.
 	 */
-	public static MappedCommandBuilder bindCommand(Class<?> messageType, CommandBuilder target, Binder binder) {
-		MappedCommandBuilder builder = MappedCommandBinder.mapCommand(messageType, target, binder.getProvider(Context.class));
+	public static MappedCommandBuilder bindCommand(Class<?> messageType, CommandBuilder target) {
+		MappedCommandBuilder builder = MappedCommandBinder.mapCommand(messageType, target);
 		mappedCommands.add(builder);
 		return builder;
 	}

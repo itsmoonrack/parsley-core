@@ -28,7 +28,7 @@ import org.spicefactory.parsley.core.messaging.receiver.MessageTarget;
  * Default implementation of MessageProcessor interface.
  * @author Sylvain Lecoy <sylvain.lecoy@gmail.com>
  */
-class DefaultMessageProcessor implements MessageProcessor<Object> {
+public class DefaultMessageProcessor implements MessageProcessor<Object> {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -46,11 +46,12 @@ class DefaultMessageProcessor implements MessageProcessor<Object> {
 	// Package-private.
 	/////////////////////////////////////////////////////////////////////////////
 
-	DefaultMessageProcessor(Message<Object> message, MessageReceiverCache cache, MessageSettings settings) {
+	protected DefaultMessageProcessor(Message<Object> message, MessageReceiverCache cache, MessageSettings settings) {
 		this(message, cache, settings, null);
 	}
 
-	DefaultMessageProcessor(Message<Object> message, MessageReceiverCache cache, MessageSettings settings, @Nullable Handler receiverHandler) {
+	protected DefaultMessageProcessor(Message<Object> message, MessageReceiverCache cache, MessageSettings settings,
+			@Nullable Handler receiverHandler) {
 		this.cache = cache;
 		this.message = message;
 		this.settings = settings;
