@@ -1,5 +1,6 @@
 package org.spicefactory.parsley.config;
 
+import java.applet.Applet;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -33,6 +34,11 @@ public class GuiceParsleyTypeListener implements TypeListener {
 	@Override
 	public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
 		Class<? super I> c = type.getRawType();
+
+		if (Applet.class.isAssignableFrom(c)) {
+			System.err.println("breakpoint");
+
+		}
 
 		// Registers an injection listener on events managed by this class
 		// so Parsley central router can dispatch them through framework.

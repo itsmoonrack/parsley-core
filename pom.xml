@@ -17,7 +17,6 @@
 
 	<modules>
 		<module>parsley-core</module>
-		<module>parsley-guice</module>
 		<module>parsley-swing</module>
 		<module>parsley-tools</module>
 	</modules>

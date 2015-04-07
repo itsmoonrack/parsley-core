@@ -11,7 +11,7 @@ import org.spicefactory.parsley.core.messaging.Selector;
 import org.spicefactory.parsley.core.scope.Scope;
 
 /**
- * This tag can be used for receiving the eventual fault events or the other exceptions.
+ * This annotation can be used for receiving the eventual fault events or the other exceptions.
  * <p>
  * <code>@CommandException protected void handleResult(Exception e, SaveUserMessage trigger);</code>
  * <p>

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Provider;
 
 import org.spicefactory.lib.command.adapter.CommandAdapter;
@@ -147,11 +148,11 @@ public class DefaultCommandObserver extends AbstractMethodReceiver implements Co
 	/////////////////////////////////////////////////////////////////////////////
 
 	private boolean addResult(List<Object> params, Object result) {
+		Class<?> param = targetMethod.getParameterTypes()[0];
 		if (result == null) {
 			params.add(null);
-			return true;
+			return param.isAnnotationPresent(Nullable.class);
 		}
-		Class<?> param = targetMethod.getParameterTypes()[0];
 		if (result instanceof CommandException) {
 			Throwable rootCause = ((CommandException) result).getCause();
 			if (param.isAssignableFrom(rootCause.getClass())) {

@@ -59,6 +59,7 @@ public class ManagedCommandLifecycle extends DefaultCommandLifecycle {
 
 	@Override
 	public void beforeExecution(Object command, CommandData data) {
+		context.injectMembers(command);
 		if (isObservableTarget(command)) {
 			context.getScopeManager().observeCommand(createObservableCommand(command));
 		} else if (command instanceof ManagedCommandProxy) {

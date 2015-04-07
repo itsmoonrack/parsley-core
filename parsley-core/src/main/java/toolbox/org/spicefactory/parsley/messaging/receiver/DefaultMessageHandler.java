@@ -2,6 +2,7 @@ package org.spicefactory.parsley.messaging.receiver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,6 +160,9 @@ class DefaultMessageHandler extends AbstractMethodReceiver implements MessageTar
 
 			targetMethod.setAccessible(true);
 			targetMethod.invoke(provider.get(), args.toArray());
+		}
+		catch (InvocationTargetException e) {
+			throw new RuntimeException("Exception in message.", e.getCause());
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

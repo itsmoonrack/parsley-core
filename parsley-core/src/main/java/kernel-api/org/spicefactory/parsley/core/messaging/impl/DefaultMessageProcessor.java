@@ -184,7 +184,7 @@ public class DefaultMessageProcessor implements MessageProcessor<Object> {
 				if (e.getCause() instanceof InvocationTargetException) {
 					e = e.getCause();
 				}
-				logger.warn("Message receiver {} threw Exception: {}", currentProcessor.currentReceiver(), e.getCause());
+				logger.warn(MessageFormat.format("Message receiver {0} threw Exception.", currentProcessor.currentReceiver()), e.getCause());
 				if (!handleException(e.getCause())) {
 					return;
 				}

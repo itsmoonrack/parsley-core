@@ -38,7 +38,7 @@ public final class GuiceParsleyConfig extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		// Registers type listener for MessageDispatcher instances. Do not bind listener
+		// Registers type listener for managed instances. Do not bind listener
 		// for swing components as the reflection on these classes can be heavy.
 		// It is instead recommended to inject a presentation model in a view with
 		// FastInject property and having a MessageDispatcher field in this model.

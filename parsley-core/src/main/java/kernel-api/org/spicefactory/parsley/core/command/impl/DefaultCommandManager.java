@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import org.spicefactory.parsley.core.command.CommandManager;
 import org.spicefactory.parsley.core.command.ObservableCommand;
 import org.spicefactory.parsley.core.command.ObservableCommand.CommandObserver;
+import org.spicefactory.parsley.core.messaging.Message;
 import org.spicefactory.parsley.core.messaging.Selector;
 
 /**
@@ -109,8 +110,12 @@ public class DefaultCommandManager implements CommandManager, CommandObserver {
 	/////////////////////////////////////////////////////////////////////////////
 
 	private boolean matchesByTrigger(ObservableCommand command, Class<?> messageType, Object selector) {
-		return (command.getTrigger() != null && messageType.isAssignableFrom(command.getTrigger().getInstance().getClass()) && (selector
-				.equals(Selector.NONE) || selector.equals(command.getTrigger().getSelector())));
+		if (command.getTrigger() == null) {
+			return false;
+		}
+		Message<Object> trigger = command.getTrigger();
+		return messageType.isAssignableFrom(trigger.getInstance().getClass())
+				&& (selector.equals(Selector.NONE) || selector.equals(trigger.getSelector()));
 	}
 
 	private boolean matchesByType(ObservableCommand command, Class<?> commandType, @Nullable String id) {
